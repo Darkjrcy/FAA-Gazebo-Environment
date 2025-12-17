@@ -127,11 +127,14 @@ def generate_launch_description():
     # Notice If you want to add more airplanes you would need to create mor json files on the Airplanes characteristics. 
 
 
+    # World file:
+    world = 'empty_world.world'
+
 
 
 
     # Main folder path where tehe flights are saved:
-    main_folder_path = "/home/adcl/AirplanePathFollower/DATA/DAA_Fligths" # Notice Change the folder with the path to your fodler DATA to save it !
+    main_folder_path = "/home/adcl/FAA-Gazebo-Environment/DATA/DAA_Flights" # Notice Change the folder with the path to your fodler DATA to save it !
     # Create tehe flight folder inside:
     tests = [f for f in os.listdir(main_folder_path) if os.path.isdir(os.path.join(main_folder_path,f))]
     # Extract the number of tests:
@@ -166,7 +169,7 @@ def generate_launch_description():
             ])
         ]),
         launch_arguments={
-            'world': [os.path.join(get_package_share_directory('plane_bringup'), 'worlds', 'empty_world.world'), ''],
+            'world': [os.path.join(get_package_share_directory('plane_bringup'), 'worlds', world), ''],
             'camera' : 'true'
         }.items()
     )

@@ -16,11 +16,15 @@ from launch_ros.actions import Node
 def generate_launch_description():
 
     # Folder Path to save the information:
-    main_folder_path = "/home/adcl/AirplanePathFollower/DATA/MIT_Fligths" # Notice Change the folder with the path to your fodler DATA to save it !
+    main_folder_path = "/home/adcl/FAA-Gazebo-Environment/DATA/MIT_Fligths" # Notice Change the folder with the path to your fodler DATA to save it !
 
     # Launch follower varaibles:
     ownship_name = "airplane_1"
     intruder_name = "airplane_2"
+
+    # World file:
+    world = 'empty_world.world'
+
 
     # Define the encoutner list, you can do it manually, but for the MIT simualtions they can be choose from hte detection_summary.
     package_share_directory_launch = Path(get_package_share_directory('plane_bringup'))
@@ -91,7 +95,7 @@ def generate_launch_description():
             ])
         ]),
         launch_arguments={
-            'world': [os.path.join(get_package_share_directory('plane_bringup'), 'worlds', 'MIT_city.world'), ''],
+            'world': [os.path.join(get_package_share_directory('plane_bringup'), 'worlds', world), ''],
             'camera' : 'true'
         }.items()
     )

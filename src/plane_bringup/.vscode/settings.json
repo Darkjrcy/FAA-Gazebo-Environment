@@ -1,0 +1,34 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/adcl/FAA-Gazebo-Environment/install/save_information/lib/python3.10/site-packages",
+        "/home/adcl/FAA-Gazebo-Environment/install/plane_follow_exec/lib/python3.10/site-packages",
+        "/home/adcl/FAA-Gazebo-Environment/install/airplane_gazebo_plugin/local/lib/python3.10/dist-packages",
+        "/home/adcl/FAA-Gazebo-Environment/install/gnss_multipath_plugin/local/lib/python3.10/dist-packages",
+        "/home/adcl/FAA-Gazebo-Environment/install/custom_msgs/local/lib/python3.10/dist-packages",
+        "/home/adcl/FAA-Gazebo-Environment/install/airplane_recognition/lib/python3.10/site-packages",
+        "/home/adcl/AriplanePathFollower/install/save_information/lib/python3.10/site-packages",
+        "/home/adcl/AriplanePathFollower/install/plane_follow_exec/lib/python3.10/site-packages",
+        "/home/adcl/AriplanePathFollower/install/gnss_multipath_plugin/local/lib/python3.10/dist-packages",
+        "/home/adcl/AriplanePathFollower/install/custom_msgs/local/lib/python3.10/dist-packages",
+        "/home/adcl/AriplanePathFollower/install/airplane_recognition/lib/python3.10/site-packages",
+        "/home/adcl/AriplanePathFollower/install/airplane_gazebo_plugin/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/adcl/FAA-Gazebo-Environment/install/save_information/lib/python3.10/site-packages",
+        "/home/adcl/FAA-Gazebo-Environment/install/plane_follow_exec/lib/python3.10/site-packages",
+        "/home/adcl/FAA-Gazebo-Environment/install/airplane_gazebo_plugin/local/lib/python3.10/dist-packages",
+        "/home/adcl/FAA-Gazebo-Environment/install/gnss_multipath_plugin/local/lib/python3.10/dist-packages",
+        "/home/adcl/FAA-Gazebo-Environment/install/custom_msgs/local/lib/python3.10/dist-packages",
+        "/home/adcl/FAA-Gazebo-Environment/install/airplane_recognition/lib/python3.10/site-packages",
+        "/home/adcl/AriplanePathFollower/install/save_information/lib/python3.10/site-packages",
+        "/home/adcl/AriplanePathFollower/install/plane_follow_exec/lib/python3.10/site-packages",
+        "/home/adcl/AriplanePathFollower/install/gnss_multipath_plugin/local/lib/python3.10/dist-packages",
+        "/home/adcl/AriplanePathFollower/install/custom_msgs/local/lib/python3.10/dist-packages",
+        "/home/adcl/AriplanePathFollower/install/airplane_recognition/lib/python3.10/site-packages",
+        "/home/adcl/AriplanePathFollower/install/airplane_gazebo_plugin/local/lib/python3.10/dist-packages",
+        "/opt/ros/humble/lib/python3.10/site-packages",
+        "/opt/ros/humble/local/lib/python3.10/dist-packages"
+    ]
+}

@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/adcl/FAA-Gazebo-Environment/install/airplane_gazebo_plugin/include/**",
+        "/home/adcl/FAA-Gazebo-Environment/install/gnss_multipath_plugin/include/**",
+        "/home/adcl/FAA-Gazebo-Environment/install/custom_msgs/include/**",
+        "/home/adcl/AriplanePathFollower/install/gnss_multipath_plugin/include/**",
+        "/home/adcl/AriplanePathFollower/install/custom_msgs/include/**",
+        "/home/adcl/AriplanePathFollower/install/airplane_gazebo_plugin/include/**",
+        "/opt/ros/humble/include/**",
+        "/home/adcl/FAA-Gazebo-Environment/src/airplane_gazebo_plugin/include/**",
+        "/home/adcl/FAA-Gazebo-Environment/src/gnss_multipath_plugin/include/**",
+        "/home/adcl/FAA-Gazebo-Environment/src/libpredict/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
