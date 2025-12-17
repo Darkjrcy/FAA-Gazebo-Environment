@@ -109,10 +109,10 @@ ros2 launch plane_bringup MIT_variable_cam_Trajectory_follower.launch.py
 ```
 
  ### Detect and Avoid Simulations
- The simulation is set up to run multiple DAA scenarios in the same run without restarting Gazebo, for that the user needs to define a list of different trajectories. The information of each traejctory is in feets and has the following format (North_1, East_1, Down_1, Velocity_1; North_2, East_2, Down_2, Velocity_2;...;North_n, East_n, Down_n, Velocity_n). To add multiple trajectories the user can divide using the percentage symbol %, for example:
+ The simulation is set up to run multiple DAA scenarios in the same run without restarting Gazebo, for that the user needs to define a list of different trajectories. The information of each traejctory is in feets and has the following format (North_1, East_1, Down_1, Velocity_1; North_2, East_2, Down_2, Velocity_2; ... ; North_n, East_n, Down_n, Velocity_n). To add multiple trajectories the user can divide using the percentage symbol %, for example:
 
 ``` python
-uav_waypoints = (
+    uav_waypoints = (
         "4000, 0, -280, 80; "
         "5200, 0, -300, 85; "
         "6400, 0, -310, 90; "
@@ -155,8 +155,83 @@ uav_waypoints = (
     )
 ```
 
+In addition, the simulation is made to handle multiple intruders and one avoider. Therefore, the user needs to define the avoider model name, the intruders model name and tehir repective waypoints. By default the simulation has 1 avoider and two inturders, but the user can add as much as it is required. After that the user needs to add the model name to the airplane spawner list.
 
+``` python
+    airplanes = [avoider_name,intruder_1_name,intruder_2_name]   # ADD THE INTRUDER TO THE SPAWNING SYSTEM TO.    
+    camera = ['2.0', '0.0', '0.0']
+    camera_numbers = ['5', '0', '0']
+```
+Then, add them to the DAA executable too, so the avoider know their existance and trajcotry followers of the UAVs are started.
 
+``` python
+    # DAA executable aluncher:
+    daa_simulation = Node(
+        package='plane_follow_exec',
+        executable='daa_simulation',
+        output = 'screen',
+        name = 'daa_simulation',
+        parameters=[{
+            "avoider_name": avoider_name,
+            "data_directory": new_folder_path,
+            "save_adsb_info": True,                     # Save the informatio that the ADS-B sends from the intruders
+            "number_intruders": "2",                    # Note: Change with the number of intruders:
+            "intruder_name_0": intruder_1_name,
+            "intruder_name_1": intruder_2_name,
+            "avoider_waypoints": avoider_waypoints,
+            "intruder_waypoints_0": intruder_1_waypoints, 
+            "intruder_waypoints_1": intruder_2_waypoints, 
+            # Note: For the intruders the initial number to start the name is with _0 with the aitplane nuber _2
+        }]
+    )
+```
+
+To start the simulatio is required to create the ADS-B node for each intruder and list them in LaunchDescription:
+
+``` python
+    adsb_intruder_1 = Node(
+        package='airplane_gazebo_plugin',      
+        executable='adsb_sensor',             
+        name='adsb_sensor_launcher',
+        output='screen',
+        emulate_tty=True,
+        arguments=["airplane_2", "imu_2", '--ros-args'],
+    )
+    adsb_intruder_2 = Node(
+        package='airplane_gazebo_plugin',      
+        executable='adsb_sensor',             
+        name='adsb_sensor_launcher',
+        output='screen',
+        emulate_tty=True,
+        arguments=["airplane_3", "imu_3", '--ros-args'],
+    )
+
+    return launch.LaunchDescription([
+        start_world,
+        *launch_descriptions_airplanes,
+        #save_video,
+        adsb_intruder_1,
+        adsb_intruder_2,
+        # Add ADS-B executables.
+        camera_fusion,
+        wait_for_gazebo_node,
+        launch_start_robot_move,
+        stop_simulation,
+         RegisterEventHandler(
+             OnProcessExit(
+                 target_action=stop_simulation,
+                 on_exit=[Shutdown()]
+             )
+         ),
+    ])
+
+```
+
+Finally, to start the simulation open the launch file from the terminal using the next command:
+
+``` bash
+    ros2 launch plane_bringup Geometric_DAA_simulation.launch.py 
+```
 
 ***
 ## Simulation Characteristics:
