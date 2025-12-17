@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="main_airplane">
+    <xacro:include filename="$(find plane_description)/urdf/Airplane_variable_Camera/airplane.xacro"/>
+    <xacro:arg name="robot_name" default="airplane_1"/>
+    <!-- Arguments for the true and false to variable add the cameras: -->
+    <xacro:arg name="use_camera1"  default="false"/>
+    <xacro:arg name="use_camera2"  default="false"/>
+    <xacro:arg name="use_camera3"  default="false"/>
+    <xacro:arg name="use_camera4"  default="false"/>
+    <xacro:arg name="use_camera5"  default="false"/>
+    <xacro:airplane  
+        robot_name="$(arg robot_name)" 
+        robot_imu="$(arg robot_imu) "
+        use_camera1="$(arg use_camera1)"
+        use_camera2="$(arg use_camera2)"
+        use_camera3="$(arg use_camera3)"
+        use_camera4="$(arg use_camera4)"
+        use_camera5="$(arg use_camera5)" />
+</robot>

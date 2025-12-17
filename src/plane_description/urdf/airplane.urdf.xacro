@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<robot name="airplane" xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:include filename="plane_base.xacro"/>
+    <gazebo>
+      <plugin name="airplane_3d_movement" filename="libairplane_3d_movement_gazebo_plugin.so">
+
+         <ros>
+   
+           <!-- Add a namespace -->
+           <namespace>/airplane1</namespace>
+   
+           <!-- Remap the default topic -->
+           <remapping>cmd_vel:=velocity</remapping>
+           <remapping>odom:=odom</remapping>
+   
+         </ros>
+   
+         <update_rate>1</update_rate>
+         <publish_rate>1</publish_rate>
+   
+         <!-- output -->
+         <publish_odom>true</publish_odom>
+         <publish_odom_tf>true</publish_odom_tf>
+   
+         <odometry_frame>custom_odom</odometry_frame>
+         <robot_base_frame>base_link</robot_base_frame>
+   
+         <covariance_x>0.0001</covariance_x>
+         <covariance_y>0.0001</covariance_y>
+         <covariance_z>0.0001</covariance_z>
+         <covariance_roll>0.01</covariance_roll>
+         <covariance_pitch>0.01</covariance_pitch>
+         <covariance_yaw>0.01</covariance_yaw>
+   
+       </plugin>
+
+     </gazebo>
+</robot>

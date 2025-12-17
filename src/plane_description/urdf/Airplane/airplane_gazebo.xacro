@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<robot name="airplane_sim" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:arg name="robot_name" default="airplane_X"/>
+    <xacro:arg name="robot_imu" default="imu_X"/>
+
+    <xacro:macro name="airplane_sim" params="robot_name robot_imu">
+    
+    <!-- Movement PLugin-->
+    <gazebo>
+            <plugin name="${robot_name}_movement" filename="libairplane_3d_movement_gazebo_plugin.so">
+    
+            <ros>
+        
+                <!-- Add a namespace -->
+                <namespace>/</namespace>
+        
+                <!-- Remap the default topic -->
+                <remapping>cmd_vel:=${robot_name}/cmd_vel</remapping>
+                <remapping>odom:=${robot_name}/odom</remapping>
+        
+            </ros>
+        
+            <update_rate>30</update_rate>
+            <publish_rate>30</publish_rate>
+        
+            <!-- output -->
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+        
+            <odometry_frame>${robot_name}/odom</odometry_frame>
+            <states_frame>${robot_name}/states</states_frame>
+            <robot_base_frame>base_link</robot_base_frame>
+        
+            <covariance_x>0.0001</covariance_x>
+            <covariance_y>0.0001</covariance_y>
+            <covariance_z>0.0001</covariance_z>
+            <covariance_roll>0.01</covariance_roll>
+            <covariance_pitch>0.01</covariance_pitch>
+            <covariance_yaw>0.01</covariance_yaw>
+        
+            </plugin>
+        </gazebo>
+
+        <!-- IMU Sensor-->
+        <gazebo reference="imu_sensor_link">
+            <gravity>true</gravity>
+            <sensor name="${robot_imu}" type='imu'>
+                <always_on>1</always_on>
+                <update_rate>100</update_rate>
+                <visualize>1</visualize>
+                <topic>__default_topic__</topic>
+                <plugin name="${robot_imu}" filename='libgazebo_ros_imu_sensor.so'>
+                    <topicName>${robot_imu}/imu_data</topicName>
+                    <bodyName>imu_sensor_link</bodyName>
+                    <updateRateHZ>10.0</updateRateHZ>
+                    <gaussianNoise>0.0</gaussianNoise>
+                    <xyzOffset>0 0 0</xyzOffset>
+                    <rpyOffset>0 0 0</rpyOffset>
+                </plugin>
+                <pose>0 0 0 0 0 0</pose>
+            </sensor>
+        </gazebo>
+
+        <!-- GPS Multipath Plugin-->
+        <gazebo reference="radar_sensor_link">
+            <sensor name="sensor_ray" type="ray">
+                <pose>0 0 0 0 0 0</pose>
+                <visualize>false</visualize>
+                <always_on>true</always_on>
+                <update_rate>2</update_rate>
+                <ray>
+                    <scan>
+                        <horizontal>
+                            <samples>720</samples>
+                            <min_angle>-3.14</min_angle>
+                            <max_angle>3.14</max_angle>
+                            <resolution>1</resolution>
+                        </horizontal>
+                        <vertical>
+                            <samples>1</samples>
+                            <min_angle>-0.8</min_angle>
+                            <max_angle>0.8</max_angle>
+                            <resolution>1</resolution>
+                        </vertical>
+                    </scan>
+                    <range>
+                        <min>0.05</min>
+                        <max>50.0</max>
+                        <resolution>1</resolution>
+                    </range>
+                </ray>
+                <plugin name="laserscan" filename="libGNSSMultipathSensorPlugin.so">
+                    <entity_name>${robot_name}</entity_name>
+                    <ros>
+                        <namespace>/gnss_multipath/${robot_name}</namespace>
+                        <remapping>~/out:=scan</remapping>
+                    </ros>
+                    <output_type>sensor_msgs/LaserScan</output_type>
+                    <disableNoise>0</disableNoise>
+                    <origin_latitude>42.47</origin_latitude>  <!-- The lat and long of the origin is defined as the origin in gazebo-->
+                    <origin_longitude>-71.28</origin_longitude>
+                    <origin_altitude>150</origin_altitude>
+                </plugin>
+            </sensor>
+         </gazebo>
+
+
+
+
+
+
+
+
+        
+
+    </xacro:macro>
+
+    
+</robot>

@@ -1,0 +1,207 @@
+<?xml version="1.0"?>
+<robot name="airplane_sim" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:arg name="robot_name" default="airplane_X"/>
+    <xacro:arg name="robot_imu" default="imu_X"/>
+    <!-- True and false conditions to add the cameras-->
+    <xacro:arg name="use_camera1"  default="false"/>
+    <xacro:arg name="use_camera2"  default="false"/>
+    <xacro:arg name="use_camera3"  default="false"/>
+    <xacro:arg name="use_camera4"  default="false"/>
+    <xacro:arg name="use_camera5"  default="false"/>
+    <xacro:property name="camera_noise_stddev" default="0.0"/>
+
+
+    <xacro:macro name="airplane_sim" params="robot_name robot_imu use_camera1 use_camera2 use_camera3 use_camera4 use_camera5"> 
+        <gazebo>
+            <plugin name="${robot_name}_movement" filename="libairplane_3d_movement_gazebo_plugin.so">
+    
+            <ros>
+        
+                <!-- Add a namespace -->
+                <namespace>/</namespace>
+        
+                <!-- Remap the default topic -->
+                <remapping>cmd_vel:=${robot_name}/cmd_vel</remapping>
+                <remapping>odom:=${robot_name}/odom</remapping>
+        
+            </ros>
+        
+            <update_rate>30</update_rate>
+            <publish_rate>30</publish_rate>
+        
+            <!-- output -->
+            <publish_odom>true</publish_odom>
+            <publish_odom_tf>true</publish_odom_tf>
+        
+            <odometry_frame>${robot_name}/odom</odometry_frame>
+            <states_frame>${robot_name}/states</states_frame>
+            <robot_base_frame>base_link</robot_base_frame>
+        
+            <covariance_x>0.0001</covariance_x>
+            <covariance_y>0.0001</covariance_y>
+            <covariance_z>0.0001</covariance_z>
+            <covariance_roll>0.01</covariance_roll>
+            <covariance_pitch>0.01</covariance_pitch>
+            <covariance_yaw>0.01</covariance_yaw>
+        
+            </plugin>
+        </gazebo>
+
+        <gazebo reference="imu_sensor_link">
+            <gravity>true</gravity>
+            <sensor name="${robot_imu}" type='imu'>
+                <always_on>1</always_on>
+                <update_rate>100</update_rate>
+                <visualize>1</visualize>
+                <topic>__default_topic__</topic>
+                <plugin name="${robot_imu}" filename='libgazebo_ros_imu_sensor.so'>
+                    <topicName>${robot_imu}/imu_data</topicName>
+                    <bodyName>imu_sensor_link</bodyName>
+                    <updateRateHZ>10.0</updateRateHZ>
+                    <gaussianNoise>0.0</gaussianNoise>
+                    <xyzOffset>0 0 0</xyzOffset>
+                    <rpyOffset>0 0 0</rpyOffset>
+                </plugin>
+                <pose>0 0 0 0 0 0</pose>
+            </sensor>
+        </gazebo>
+
+        <!-- Optional addition of the camras:-->
+
+        <!-- CAMERA 1 (frontal) -->
+        <xacro:if value="${use_camera1}">
+          <gazebo reference="camera1_link">
+            <sensor type="camera" name="${robot_name}_camera1">
+              <update_rate>20.0</update_rate>
+              <camera name="${robot_name}_camera1">
+                <horizontal_fov>1.39616</horizontal_fov>
+                <image><width>3776</width><height>2360</height><format>R8G8B8</format></image>
+                <save enabled="false"><path>/home/adcl/AirplanePathFollower/DATA/Videos/camera1</path></save>
+                <clip><near>4.0</near><far>4000</far></clip>
+                <noise><type>gaussian</type><mean>0.0</mean><stddev>${camera_noise_stddev}</stddev></noise>
+              </camera>
+              <plugin name="${robot_name}_camera1_controller" filename="libgazebo_ros_camera.so">
+                <alwaysOn>true</alwaysOn>
+                <updateRate>20.0</updateRate>
+                <cameraName>${robot_name}/camera1</cameraName>
+                <imageTopicName>camera1/image_raw</imageTopicName>
+                <cameraInfoTopicName>camera1/camera_info</cameraInfoTopicName>
+                <frameName>camera1_link</frameName>
+                <hackBaseline>0.07</hackBaseline>
+                <distortionK1>0.0</distortionK1><distortionK2>0.0</distortionK2>
+                <distortionK3>0.0</distortionK3><distortionT1>0.0</distortionT1><distortionT2>0.0</distortionT2>
+              </plugin>
+            </sensor>
+          </gazebo>
+        </xacro:if>
+
+        <!-- CAMERA 2 (right-front) -->
+        <xacro:if value="${use_camera2}">
+          <gazebo reference="camera2_link">
+            <sensor type="camera" name="${robot_name}_camera2">
+              <update_rate>20.0</update_rate>
+              <camera name="${robot_name}_camera2">
+                <horizontal_fov>1.39616</horizontal_fov>
+                <image><width>3776</width><height>2360</height><format>R8G8B8</format></image>
+                <save enabled="false"><path>/home/adcl/AirplanePathFollower/DATA/Videos/camera2</path></save>
+                <clip><near>4.0</near><far>4000</far></clip>
+                <noise><type>gaussian</type><mean>0.0</mean><stddev>${camera_noise_stddev}</stddev></noise>
+              </camera>
+              <plugin name="${robot_name}_camera2_controller" filename="libgazebo_ros_camera.so">
+                <alwaysOn>true</alwaysOn>
+                <updateRate>20.0</updateRate>
+                <cameraName>${robot_name}/camera2</cameraName>
+                <imageTopicName>camera2/image_raw</imageTopicName>
+                <cameraInfoTopicName>camera2/camera_info</cameraInfoTopicName>
+                <frameName>camera2_link</frameName>
+                <hackBaseline>0.07</hackBaseline>
+                <distortionK1>0.0</distortionK1><distortionK2>0.0</distortionK2>
+                <distortionK3>0.0</distortionK3><distortionT1>0.0</distortionT1><distortionT2>0.0</distortionT2>
+              </plugin>
+            </sensor>
+          </gazebo>
+        </xacro:if>
+
+        <!-- CAMERA 3 (right-back) -->
+        <xacro:if value="${use_camera3}">
+          <gazebo reference="camera3_link">
+            <sensor type="camera" name="${robot_name}_camera3">
+              <update_rate>20.0</update_rate>
+              <camera name="${robot_name}_camera3">
+                <horizontal_fov>1.39616</horizontal_fov>
+                <image><width>3776</width><height>2360</height><format>R8G8B8</format></image>
+                <save enabled="false"><path>/home/adcl/AirplanePathFollower/DATA/Videos/camera3</path></save>
+                <clip><near>4.0</near><far>4000</far></clip>
+                <noise><type>gaussian</type><mean>0.0</mean><stddev>${camera_noise_stddev}</stddev></noise>
+              </camera>
+              <plugin name="${robot_name}_camera3_controller" filename="libgazebo_ros_camera.so">
+                <alwaysOn>true</alwaysOn>
+                <updateRate>20.0</updateRate>
+                <cameraName>${robot_name}/camera3</cameraName>
+                <imageTopicName>camera3/image_raw</imageTopicName>
+                <cameraInfoTopicName>camera3/camera_info</cameraInfoTopicName>
+                <frameName>camera3_link</frameName>
+                <hackBaseline>0.07</hackBaseline>
+                <distortionK1>0.0</distortionK1><distortionK2>0.0</distortionK2>
+                <distortionK3>0.0</distortionK3><distortionT1>0.0</distortionT1><distortionT2>0.0</distortionT2>
+              </plugin>
+            </sensor>
+          </gazebo>
+        </xacro:if>
+
+        <!-- CAMERA 4 (left-front) -->
+        <xacro:if value="${use_camera4}">
+          <gazebo reference="camera4_link">
+            <sensor type="camera" name="${robot_name}_camera4">
+              <update_rate>20.0</update_rate>
+              <camera name="${robot_name}_camera4">
+                <horizontal_fov>1.39616</horizontal_fov>
+                <image><width>3776</width><height>2360</height><format>R8G8B8</format></image>
+                <save enabled="false"><path>/home/adcl/AirplanePathFollower/DATA/Videos/camera4</path></save>
+                <clip><near>4.0</near><far>4000</far></clip>
+                <noise><type>gaussian</type><mean>0.0</mean><stddev>${camera_noise_stddev}</stddev></noise>
+              </camera>
+              <plugin name="${robot_name}_camera4_controller" filename="libgazebo_ros_camera.so">
+                <alwaysOn>true</alwaysOn>
+                <updateRate>20.0</updateRate>
+                <cameraName>${robot_name}/camera4</cameraName>
+                <imageTopicName>camera4/image_raw</imageTopicName>
+                <cameraInfoTopicName>camera4/camera_info</cameraInfoTopicName>
+                <frameName>camera4_link</frameName>
+                <hackBaseline>0.07</hackBaseline>
+                <distortionK1>0.0</distortionK1><distortionK2>0.0</distortionK2>
+                <distortionK3>0.0</distortionK3><distortionT1>0.0</distortionT1><distortionT2>0.0</distortionT2>
+              </plugin>
+            </sensor>
+          </gazebo>
+        </xacro:if>
+
+        <!-- CAMERA 5 (left-back) -->
+        <xacro:if value="${use_camera5}">
+          <gazebo reference="camera5_link">
+            <sensor type="camera" name="${robot_name}_camera5">
+              <update_rate>20.0</update_rate>
+              <camera name="${robot_name}_camera5">
+                <horizontal_fov>1.39616</horizontal_fov>
+                <image><width>3776</width><height>2360</height><format>R8G8B8</format></image>
+                <save enabled="false"><path>/home/adcl/AirplanePathFollower/DATA/Videos/camera5</path></save>
+                <clip><near>4.0</near><far>4000</far></clip>
+                <noise><type>gaussian</type><mean>0.0</mean><stddev>${camera_noise_stddev}</stddev></noise>
+              </camera>
+              <plugin name="${robot_name}_camera5_controller" filename="libgazebo_ros_camera.so">
+                <alwaysOn>true</alwaysOn>
+                <updateRate>20.0</updateRate>
+                <cameraName>${robot_name}/camera5</cameraName>
+                <imageTopicName>camera5/image_raw</imageTopicName>
+                <cameraInfoTopicName>camera5/camera_info</cameraInfoTopicName>
+                <frameName>camera5_link</frameName> <!-- fixed: no ${robot_name}_... here -->
+                <hackBaseline>0.07</hackBaseline>
+                <distortionK1>0.0</distortionK1><distortionK2>0.0</distortionK2>
+                <distortionK3>0.0</distortionK3><distortionT1>0.0</distortionT1><distortionT2>0.0</distortionT2>
+              </plugin>
+            </sensor>
+          </gazebo>
+        </xacro:if>
+    </xacro:macro>
+</robot>

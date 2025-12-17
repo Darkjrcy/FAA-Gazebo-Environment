@@ -1,0 +1,345 @@
+<?xml version="1.0" ?>
+<robot name="airplane" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:arg name="robot_name" default="airplane_X"/>
+    <xacro:arg name="robot_imu" default="imu_X"/>
+    <xacro:include filename="$(find plane_description)/urdf/Airplane_Scaled/airplane_gazebo.xacro"/>
+
+    <xacro:macro name="airplane" params="robot_name robot_imu">  
+    
+        <!-- LINK SECTIONS OF THE QUADCOPTER-->
+        <!-- Base dummy link-->
+        <link name="base_link"/>
+        
+        <!-- Link of the model by OR-->
+        <link name="airplane_link">
+            <inertial>
+                <mass value="340.195" />
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+                <inertia ixx="642.65" ixy="0" ixz="0" iyy="912.465" iyz="0" izz="1333.42" />
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/body.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/body.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </visual>
+
+            <!-- Debug - Centers of pressure -->
+            <!--<visual name="cp_left_wing">
+                <pose>-1 2.205 1.5 0 0 0</pose>
+                <geometry>
+                <sphere><radius>0.1</radius></sphere>
+                </geometry>
+            </visual>
+
+            <visual name="cp_right_wing">
+                <pose>-1 -2.205 1.5 0 0 0</pose>
+                <geometry>
+                <sphere><radius>0.1</radius></sphere>
+                </geometry>
+            </visual>
+
+            <visual name="cp_elevator">
+                <pose>-5.45 0 0.55 0 0 0</pose>
+                <geometry>
+                <sphere><radius>0.1</radius></sphere>
+                </geometry>
+            </visual>
+
+            <visual name="cp_rudder">
+                <pose>-6 0 1.55 0 0 0</pose>
+                <geometry>
+                <sphere><radius>0.1</radius></sphere>
+                </geometry>
+            </visual>-->
+
+        </link>
+        
+        
+        <link name="left_aileron_link">
+            <inertial>
+                <mass value="1" />
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0"/>
+                <inertia ixx="0.4217" ixy="0" ixz="0" iyy="0.00595" iyz="0" izz="0.4275" />
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/left_aileron.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/left_aileron.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <link name="left_flap_link">
+            <inertial>
+                <mass value="1" />
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0"/>
+                <inertia ixx="0.33735" ixy="0" ixz="0" iyy="0.0121" iyz="0" izz="0.3481" />
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/left_flap.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/left_flap.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <link name="right_aileron_link">
+            <inertial>
+                <mass value="1" />
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0"/>
+                <inertia ixx="0.4217" ixy="0" ixz="0" iyy="0.00595" iyz="0" izz="0.4275" />
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/right_aileron.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/right_aileron.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <link name="right_flap_link">
+            <inertial>
+                <mass value="1" />
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0"/>
+                <inertia ixx="0.33735" ixy="0" ixz="0" iyy="0.0121" iyz="0" izz="0.3481" />
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/right_flap.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/right_flap.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <link name="elevators_link">
+            <inertial>
+                <mass value="1" />
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/> 
+                <inertia ixx="0.75" ixy="0" ixz="0" iyy="0.0137" iyz="0" izz="0.7633" />
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/elevators.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/elevators.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <link name="rudder_link">
+            <inertial>
+                <mass value="1" />
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/> 
+                <inertia ixx="0.2354" ixy="0" ixz="0" iyy="0.2604" iyz="0" izz="0.0254" />
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/rudder.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/rudder.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <link name="propeller_link">
+            <inertial>
+                <mass value="9.185" />
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/> 
+                <inertia ixx="3.7536" ixy="0" ixz="0" iyy="3.7575" iyz="0" izz="0.0341375" />
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/cessna_prop.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/cessna_prop.dae" scale="0.5 0.5 0.5"/>
+                </geometry>
+            </visual>
+        </link>
+
+
+
+        <!-- Joitns of the model by OR-->
+        <joint name="left_aileron_joint" type="revolute">
+            <parent link="airplane_link"/>
+            <child link="left_aileron_link"/>
+            <axis xyz="0 1 0"/> 
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/> 
+            <limit effort="-1.0" velocity="-1.0" lower="-0.53" upper="0.53"/> 
+            <dynamics damping="1.0" friction="0.0"/> 
+        </joint>
+
+        <joint name="left_flap_joint" type="revolute">
+            <parent link="airplane_link"/>
+            <child link="left_flap_link"/>
+            <axis xyz="0 1 0"/> 
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0"/>
+            <limit effort="-1.0" velocity="-1.0" lower="-0.53" upper="0.53"/> 
+            <dynamics damping="1.0" friction="0.0"/> 
+        </joint>
+
+        <joint name="right_aileron_joint" type="revolute">
+            <parent link="airplane_link"/>
+            <child link="right_aileron_link"/>
+            <axis xyz="0 1 0"/> 
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0"/> 
+            <limit effort="-1.0" velocity="-1.0" lower="-0.53" upper="0.53"/> 
+            <dynamics damping="1.0" friction="0.0"/> 
+        </joint>
+
+        <joint name="right_flap_joint" type="revolute">
+            <parent link="airplane_link"/>
+            <child link="right_flap_link"/>
+            <axis xyz="0 1 0"/> 
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0"/>
+            <limit effort="-1.0" velocity="-1.0" lower="-0.53" upper="0.53"/> 
+            <dynamics damping="1.0" friction="0.0"/> 
+        </joint>
+
+        <joint name="elevators_joint" type="revolute">
+            <parent link="airplane_link"/>
+            <child link="elevators_link"/>
+            <axis xyz="0 1 0"/> 
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0"/>
+            <limit effort="-1.0" velocity="-1.0" lower="-0.53" upper="0.53"/> 
+            <dynamics damping="1.0" friction="0.0"/> 
+        </joint>
+
+        <joint name="rudder_joint" type="revolute">
+            <parent link="airplane_link"/>
+            <child link="rudder_link"/>
+            <axis xyz="0 0 1"/> 
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0"/>
+            <limit effort="-1.0" velocity="-1.0" lower="-0.53" upper="0.53"/> 
+            <dynamics damping="1.0" friction="0.0"/> 
+        </joint>
+
+        <joint name="propeller_joint" type="revolute">
+            <parent link="airplane_link"/>
+            <child link="propeller_link"/>
+            <axis xyz="1 0 0"/> 
+            <origin xyz="0.895 0.0 0.4275" rpy="0.0 0 0.0"/>
+            <limit effort="-1.0" velocity="-1.0" lower="-1000" upper="1000"/> 
+            <dynamics damping="0.001" friction="0.0"/> 
+        </joint>
+
+
+        <!-- Link of the sensors by Jorge -->
+        <!--Imu link -->
+        <link name="imu_sensor_link">
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.02 0.02 0.02"/>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.02 0.02 0.02"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="0.001" />
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <inertia ixx="0.00000015" ixy="0" ixz="0" iyy="0.00000015" iyz="0" izz="0.00000015" />
+            </inertial>
+        </link>
+        <!--Radar Senor Link-->
+        <link name="radar_sensor_link">
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.02 0.02 0.02"/>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.02 0.02 0.02"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="0.1" />
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <inertia ixx="0.0000015" ixy="0" ixz="0" iyy="0.00000015" iyz="0" izz="0.0000015" />
+            </inertial>
+        </link>
+        
+
+
+        <!--JOINT SECTIONS OF THE QUADCOPTER-->
+        <!-- Airplane joint to the Base Link-->
+        <joint name="airplane_joint" type="fixed">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <parent link="base_link"/>
+            <child link="airplane_link"/>
+        </joint>
+        <!-- IMU Sensor Joint-->
+        <joint name="imu_sensor_joint" type="fixed">
+            <axis xyz="0 0 1" />
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <parent link="base_link"/>
+            <child link="imu_sensor_link"/>
+        </joint>
+        <!-- Radar Sensor JOint-->
+        <joint name="radar_sensor_joint" type="fixed">
+            <axis xyz="0 0 0.0" />
+            <origin xyz="0.0 0.0 0.225" rpy="0.0 0.0 0.0"/>
+            <parent link="base_link"/>
+            <child link="radar_sensor_link"/>
+        </joint> 
+
+        <!-- Aiplane Gazebo Plugins-->
+        <!-- Airplne Gazebo simulation details -->
+        <xacro:airplane_sim robot_name="$(arg robot_name)" robot_imu="$(arg robot_imu)"/>
+
+    </xacro:macro>
+    
+</robot>

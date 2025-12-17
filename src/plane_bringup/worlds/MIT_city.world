@@ -1,0 +1,904 @@
+<sdf version='1.7'>
+  <world name='default'>
+    <plugin name='gazebo_ros_state' filename='libgazebo_ros_state.so'>
+      <ros>
+        <namespace>/gazebo</namespace>
+        <argument>use_sim_time:=true</argument>
+      </ros>
+    </plugin>
+    <plugin name='real_time_factor_plugin' filename='libreal_time_factor_plugin.so'/>
+    <light name='sun' type='directional'>
+      <cast_shadows>1</cast_shadows>
+      <pose>0 0 10 0 -0 0</pose>
+      <diffuse>0.8 0.8 0.8 1</diffuse>
+      <specular>0.2 0.2 0.2 1</specular>
+      <attenuation>
+        <range>1000</range>
+        <constant>0.9</constant>
+        <linear>0.01</linear>
+        <quadratic>0.001</quadratic>
+      </attenuation>
+      <direction>-0.5 0.1 -0.9</direction>
+      <spot>
+        <inner_angle>0</inner_angle>
+        <outer_angle>0</outer_angle>
+        <falloff>0</falloff>
+      </spot>
+    </light>
+    <model name='ground_plane'>
+      <static>1</static>
+      <link name='link'>
+        <collision name='collision'>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>100</mu>
+                <mu2>50</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual'>
+          <cast_shadows>0</cast_shadows>
+          <geometry>
+            <plane>
+              <normal>0 0 1</normal>
+              <size>100 100</size>
+            </plane>
+          </geometry>
+          <material>
+            <script>
+              <uri>file://media/materials/scripts/gazebo.material</uri>
+              <name>Gazebo/Grey</name>
+            </script>
+          </material>
+        </visual>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <gravity>0 0 0</gravity>
+    <magnetic_field>6e-06 2.3e-05 -4.2e-05</magnetic_field>
+    <atmosphere type='adiabatic'/>
+    <physics type='ode'>
+      <max_step_size>0.001</max_step_size>
+      <real_time_factor>1</real_time_factor>
+      <real_time_update_rate>1000</real_time_update_rate>
+    </physics>
+    <scene>
+      <ambient>0.4 0.4 0.4 1</ambient>
+      <background>0.7 0.7 0.7 1</background>
+      <shadows>1</shadows>
+      <fog>
+        <color>0.7 0.7 0.7 1</color>
+        <type>exp</type>
+        <density>0.0</density>
+      </fog>
+    </scene>
+    <audio>
+      <device>default</device>
+    </audio>
+    <wind/>
+    <spherical_coordinates>
+      <surface_model>EARTH_WGS84</surface_model>
+      <latitude_deg>0</latitude_deg>
+      <longitude_deg>0</longitude_deg>
+      <elevation>0</elevation>
+      <heading_deg>0</heading_deg>
+    </spherical_coordinates>
+    <model name='MIT_Section4'>
+      <pose>-2.90888 1.53685 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <cast_shadows>true</cast_shadows>
+          <receive_shadows>true</receive_shadows>
+          <material>
+            <lighting>true</lighting>
+          </material>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section4/Section4.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section4/Section4.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section2'>
+      <pose>-250.283 6849.36 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section2/Section2.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section2/Section2.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section3'>
+      <pose>-7791.14 581.101 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section3/Section3.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section3/Section3.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section1'>
+      <pose>-7571.59 7847.06 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section1/Section1.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section1/Section1.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <state world_name='default'>
+      <sim_time>1832 83000000</sim_time>
+      <real_time>166 142178595</real_time>
+      <wall_time>1744303907 762259755</wall_time>
+      <iterations>165849</iterations>
+      <model name='MIT_Section1'>
+        <pose>-11061.7 11696.5 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>-11061.7 11696.5 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section10'>
+        <pose>-3688.5 -3878.6 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>-3688.5 -3878.6 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section11'>
+        <pose>-11061.2 -11669.5 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>-11061.2 -11669.5 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section12'>
+        <pose>-3673.48 -11662.7 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>-3673.48 -11662.7 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section13'>
+        <pose>3701.71 -3879.37 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>3701.71 -3879.37 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section14'>
+        <pose>11092.6 -3878.03 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>11092.6 -3878.03 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section15'>
+        <pose>3729.71 -11655.8 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>3729.71 -11655.8 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section16'>
+        <pose>10267.4 -11669.8 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>10267.4 -11669.8 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section2'>
+        <pose>-11069 11698.9 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>-11069 11698.9 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section3'>
+        <pose>-11063.5 3905.65 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>-11063.5 3905.65 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section4'>
+        <pose>-11074.4 3902.52 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>-11074.4 3902.52 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section5'>
+        <pose>3681.9 11708 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>3681.9 11708 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section6'>
+        <pose>11048.3 11702.4 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>11048.3 11702.4 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section7'>
+        <pose>3687.2 3925.14 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>3687.2 3925.14 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section8'>
+        <pose>11064.2 3929.54 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>11064.2 3929.54 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='MIT_Section9'>
+        <pose>-11066.3 -3879.01 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='city'>
+          <pose>-11066.3 -3879.01 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='ground_plane'>
+        <pose>0 0 0 0 -0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose>0 0 0 0 -0 0</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>0 0 0 0 -0 0</acceleration>
+          <wrench>0 0 0 0 -0 0</wrench>
+        </link>
+      </model>
+      <light name='sun'>
+        <pose>0 0 10 0 -0 0</pose>
+      </light>
+    </state>
+    <gui fullscreen='0'>
+      <camera name='user_camera'>
+        <pose>378.484 -14410.3 2329.79 1e-06 1.5458 1.56767</pose>
+        <view_controller>orbit</view_controller>
+        <projection_type>perspective</projection_type>
+      </camera>
+    </gui>
+    <model name='MIT_Section7'>
+      <pose>945.918 228.412 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section7/Section7.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section7/Section7.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section5'>
+      <pose>990.051 8558.84 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section5/Section5.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section5/Section5.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section6'>
+      <pose>8073.57 8261.33 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section6/Section6.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section6/Section6.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section8'>
+      <pose>9160.25 6851.14 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section8/Section8.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section8/Section8.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section10'>
+      <pose>-1150.95 -541.377 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section10/Section10.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section10/Section10.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section9'>
+      <pose>-9593.25 -1173.59 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section9/Section9.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section9/Section9.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section11'>
+      <pose>-13975.5 -8191.99 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section11/Section11.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section11/Section11.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section12'>
+      <pose>-5951.13 -8868.29 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section12/Section12.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section12/Section12.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section13'>
+      <pose>710.218 -445.521 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section13/Section13.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section13/Section13.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section15'>
+      <pose>575.182 -8174.38 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section15/Section15.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section15/Section15.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section14'>
+      <pose>7624.18 -7744.8 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section14/Section14.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section14/Section14.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+    <model name='MIT_Section16'>
+      <pose>14282.9 -8052.54 0 0 -0 0</pose>
+      <static>1</static>
+      <link name='city'>
+        <visual name='visual'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section16/Section16.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+        </visual>
+        <collision name='collision'>
+          <geometry>
+            <mesh>
+              <uri>model://MIT_Section16/Section16.dae</uri>
+            </mesh>
+          </geometry>
+          <pose>0 0 -3.5 0 -0 0</pose>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <self_collide>0</self_collide>
+        <enable_wind>0</enable_wind>
+        <kinematic>0</kinematic>
+      </link>
+    </model>
+  </world>
+</sdf>

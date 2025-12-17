@@ -1,0 +1,5 @@
+std_msgs/Header header
+InferenceResult[] yolov11_inference
+float32 preprocess_time
+float32 inference_time
+float32 postprocess_time

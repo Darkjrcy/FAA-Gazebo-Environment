@@ -1,0 +1,268 @@
+<?xml version="1.0" ?>
+<robot name="airplane" xmlns:xacro="http://ros.org/wiki/xacro">
+
+    <xacro:arg name="robot_name" default="airplane_X"/>
+    <xacro:arg name="robot_imu" default="imu_X"/>
+    <!-- True and false conditions to add the cameras-->
+    <xacro:arg name="use_camera1"  default="false"/>
+    <xacro:arg name="use_camera2"  default="false"/>
+    <xacro:arg name="use_camera3"  default="false"/>
+    <xacro:arg name="use_camera4"  default="false"/>
+    <xacro:arg name="use_camera5"  default="false"/>
+    <xacro:include filename="$(find plane_description)/urdf/Airplane_variable_Camera/airplane_gazebo.xacro"/>
+
+    <xacro:macro name="airplane" params="robot_name robot_imu use_camera1 use_camera2 use_camera3 use_camera4 use_camera5">  
+
+        
+
+        <link name="base_link"/>
+        
+        <!-- Link of the model by OR-->
+        <link name="airplane_link">
+            <inertial>
+                <mass value="680.389" />
+                <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+                <inertia ixx="1285.315427874" ixy="0" ixz="0" iyy="1824.930976707" iyz="0" izz="2666.893931043" />
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/body.dae" scale="1.0 1.0 1.0"/>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/body.dae" scale="1.0 1.0 1.0"/>
+                </geometry>
+            </visual>
+        </link>
+        
+
+        <link name="rudder_link">
+            <inertial>
+                <mass value="2" />
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/> 
+                <inertia ixx="0.4708" ixy="0" ixz="0" iyy="0.5208" iyz="0" izz="0.0508" />
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/rudder.dae" scale="1.0 1.0 1.0"/>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/rudder.dae" scale="1.0 1.0 1.0"/>
+                </geometry>
+            </visual>
+        </link>
+
+        <link name="propeller_link">
+            <inertial>
+                <mass value="18.37" />
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/> 
+                <inertia ixx="7.5067" ixy="0" ixz="0" iyy="7.5150" iyz="0" izz="0.068275" />
+            </inertial>
+
+            <collision name="collision">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/cessna_prop.dae" scale="1.0 1.0 1.0"/>
+                </geometry>
+            </collision>
+
+            <visual name="visual">
+                <geometry>
+                    <mesh filename="file://$(find plane_description)/meshes/Cessna/cessna_prop.dae" scale="1.0 1.0 1.0"/>
+                </geometry>
+            </visual>
+        </link>
+
+
+
+        <!-- Joitns of the model by OR-->
+
+        <joint name="rudder_joint" type="revolute">
+            <parent link="airplane_link"/>
+            <child link="rudder_link"/>
+            <axis xyz="0 0 1"/> 
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0 0.0"/>
+            <limit effort="-1.0" velocity="-1.0" lower="-0.53" upper="0.53"/> 
+            <dynamics damping="1.0" friction="0.0"/> 
+        </joint>
+
+        <joint name="propeller_joint" type="revolute">
+            <parent link="airplane_link"/>
+            <child link="propeller_link"/>
+            <axis xyz="1 0 0"/> 
+            <origin xyz="1.79 0.0 0.855" rpy="0.0 0 0.0"/>
+            <limit effort="-1.0" velocity="-1.0" lower="-1000" upper="1000"/> 
+            <dynamics damping="0.001" friction="0.0"/> 
+        </joint>
+
+
+
+        <!-- Link of the sensors by Jorge -->
+        <link name="imu_sensor_link">
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.02 0.02 0.02"/>
+                </geometry>
+            </collision>
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.02 0.02 0.02"/>
+                </geometry>
+            </visual>
+            <inertial>
+                <mass value="0.001" />
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <inertia ixx="0.00000015" ixy="0" ixz="0" iyy="0.00000015" iyz="0" izz="0.00000015" />
+            </inertial>
+        </link>
+
+        <!-- Optional links created for each camera: -->
+        <xacro:if value="${use_camera1}">
+            <link name="camera1_link">
+                <visual>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                        <box size="0.02 0.02 0.02"/>
+                    </geometry>
+                </visual>
+                <inertial>
+                    <mass value="0.001" />
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <inertia ixx="0.00000015" ixy="0" ixz="0" iyy="0.00000015" iyz="0" izz="0.00000015" />
+                </inertial>
+            </link>
+
+            <joint name="camera1_link_joint" type="fixed">
+                <origin rpy="0 0 0" xyz="1.05 0.0 0.0"/>
+                <parent link="base_link"/>
+                <child link="camera1_link"/>
+            </joint>
+        </xacro:if>
+
+        <xacro:if value="${use_camera2}">
+            <link name="camera2_link">
+                <visual>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                        <box size="0.02 0.02 0.02"/>
+                    </geometry>
+                </visual>
+                <inertial>
+                    <mass value="0.001" />
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <inertia ixx="0.00000015" ixy="0" ixz="0" iyy="0.00000015" iyz="0" izz="0.00000015" />
+                </inertial>
+            </link>
+
+            <joint name="camera2_link_joint" type="fixed">
+                <origin rpy="0 0 -1.2565" xyz="-0.013525 -1.4265 0.0"/>
+                <parent link="base_link"/>
+                <child link="camera2_link"/>
+            </joint>
+        </xacro:if>
+
+        <xacro:if value="${use_camera3}">
+            <link name="camera3_link">
+                <visual>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                        <box size="0.02 0.02 0.02"/>
+                    </geometry>
+                </visual>
+                <inertial>
+                    <mass value="0.001" />
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <inertia ixx="0.00000015" ixy="0" ixz="0" iyy="0.00000015" iyz="0" izz="0.00000015" />
+                </inertial>
+            </link>
+            
+            <joint name="camera3_link_joint" type="fixed">
+                <origin rpy="0 0 -2.513" xyz="-1.663525 -0.881677 0.0"/>
+                <parent link="base_link"/>
+                <child link="camera3_link"/>
+            </joint>
+        </xacro:if>
+
+        <xacro:if value="${use_camera4}">
+            <link name="camera4_link">
+                <visual>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                        <box size="0.02 0.02 0.02"/>
+                    </geometry>
+                </visual>
+                <inertial>
+                    <mass value="0.001" />
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <inertia ixx="0.00000015" ixy="0" ixz="0" iyy="0.00000015" iyz="0" izz="0.00000015" />
+                </inertial>
+            </link>
+
+            <joint name="camera4_link_joint" type="fixed">
+                <origin rpy="0 0 1.2565" xyz="-0.013525 1.4265 0.0"/>
+                <parent link="base_link"/>
+                <child link="camera4_link"/>
+            </joint>
+        </xacro:if>
+
+        <xacro:if value="${use_camera5}">
+            <link name="camera5_link">
+                <visual>
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <geometry>
+                        <box size="0.02 0.02 0.02"/>
+                    </geometry>
+                </visual>
+                <inertial>
+                    <mass value="0.001" />
+                    <origin xyz="0 0 0" rpy="0 0 0"/>
+                    <inertia ixx="0.00000015" ixy="0" ixz="0" iyy="0.00000015" iyz="0" izz="0.00000015" />
+                </inertial>
+            </link>
+            
+            <joint name="camera5_link_joint" type="fixed">
+                <origin rpy="0 0 2.513" xyz="-1.663525 0.881677 0.0"/>
+                <parent link="base_link"/>
+                <child link="camera5_link"/>
+            </joint>
+        </xacro:if>
+
+        
+        
+
+        <!-- Joints of the Airplane by Jorge-->
+
+        <joint name="airplane_joint" type="fixed">
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <parent link="base_link"/>
+            <child link="airplane_link"/>
+        </joint>
+
+        <joint name="imu_sensor_joint" type="fixed">
+            <axis xyz="0 0 1" />
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <parent link="base_link"/>
+            <child link="imu_sensor_link"/>
+        </joint>
+
+
+        <!-- AIrplne Gazebo simulation details -->
+        <xacro:airplane_sim 
+            robot_name="$(arg robot_name)" 
+            robot_imu="$(arg robot_imu)"
+            use_camera1="$(arg use_camera1)"
+            use_camera2="$(arg use_camera2)"
+            use_camera3="$(arg use_camera3)"
+            use_camera4="$(arg use_camera4)"
+            use_camera5="$(arg use_camera5)" />
+
+    </xacro:macro>   
+</robot>

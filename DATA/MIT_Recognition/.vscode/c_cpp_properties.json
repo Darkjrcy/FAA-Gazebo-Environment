@@ -1,0 +1,29 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/adcl/3DR/install/hector_gazebo_plugins/include/**",
+        "/home/adcl/3DR/install/gnss_multipath_plugin/include/**",
+        "/home/adcl/3DR/install/airplane_gazebo_plugin/include/**",
+        "/home/adcl/AirplanePathFollower/install/gnss_multipath_plugin/include/**",
+        "/home/adcl/AirplanePathFollower/install/custom_msgs/include/**",
+        "/home/adcl/AirplanePathFollower/install/airplane_gazebo_plugin/include/**",
+        "/opt/ros/humble/include/**",
+        "/home/adcl/AirplanePathFollower/src/airplane_gazebo_plugin/include/**",
+        "/home/adcl/AirplanePathFollower/src/gnss_multipath_plugin/include/**",
+        "/home/adcl/AirplanePathFollower/src/libpredict/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

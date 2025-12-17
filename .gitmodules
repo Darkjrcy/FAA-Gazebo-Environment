@@ -1,0 +1,7 @@
+[submodule "src/libpredict"]
+	path = src/libpredict
+	url = https://github.com/Darkjrcy/libpredict
+[submodule "src/gnss_multipath_plugin"]
+	path = src/gnss_multipath_plugin
+	url = https://github.com/Darkjrcy/gnss_multipath_plugin.git
+	branch = main
