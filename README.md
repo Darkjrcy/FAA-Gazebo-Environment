@@ -69,19 +69,7 @@ The process to generate new worlds for you Gazebo Simulation is presented in [Wo
 
 ***
 ## Run the Detection Simulations
-The Repository contains two main detection simulations models:
-
-### One Camera Detection Simulation
-The first simulation uses a single camera to detect airplanes with YOLO, using the closest approach point from the MIT Detect and Avoid (DAA) trajectories. The results are saved in DATA/MIT_One_Camera_Recognition. Inside this directory, the Test folder contains two detection result files:
-
-* Detection_events.csv: a description of detection events
-* Detection_process.csv: simultaneous detection process result
-
-Run this launch file to run the simulation:
-
-```bash
-ros2 launch plane_bringup MIT_one_camera_recognition.launch.py 
-```
+The Repository contains four main detection simulations models:
 
 ### Casia X Camera Detection Simulation
 There is an additional detection simulation based on the closest approach point from the MIT Detect and Avoid (DAA) trajectories, which uses a realistic camera configuration of 5 cameras (Casia X). The resulting detection files follow the same structure as the previous simulation and are saved in FOLDER/MIT_Recognition. To run this simulation, use the next command.
