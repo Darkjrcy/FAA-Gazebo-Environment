@@ -71,15 +71,54 @@ The process to generate new worlds for you Gazebo Simulation is presented in [Wo
 ## Run the Detection Simulations
 The Repository contains three main detection simulations, each one with their own launch file and characteristics.
 
+## MIT Encounter Set Simulator.
+The ROS2 pacakge has a mit_path_follower executable, which les you simulate the intruder and ownship movements defined in the MIT DAA encoutner sets. To cahneg the encounter sets go to the src/plane_bringup/launch/MIT_Trajectory_follower.launch.py file and change the encounter set list. The program woudl simulate that encounter sets adn save the airplane and detection infromation in the DATA/MIT_Fligths folder. 
+```python
+# Launch follower varaibles:
+    ownship_name = "airplane_1"
+    intruder_name = "airplane_2"
+    encounter_list = "125,123,2689" # Add how many encounter sets you want in the string "encounter_1,encounter_2,..."
+    use_gpu = True # CHnage in case you want to use GPU in the YOLO detection model.
+```
+To run the executbale you only need to launch the file using the ros2 command:
+```bash
+ros2 launch plane_bringup MIT_Trajectory_follower.launch.py 
+```
+
+**IMPORTANT:** Before running the simulations, you must add the MIT encounter set data file [data.zip](https://www.ll.mit.edu/r-d/datasets/unmanned-aircraft-terminal-area-encounters) in src/plane_follow_exec/DATA/.
+ to src/plane_follow_exec/DATA/. Additionally, if you want to use the MIT encounters list with the nearest CPA to use detection add the file [terminal_encounter_info_20200630.csv](https://www.ll.mit.edu/r-d/datasets/unmanned-aircraft-terminal-area-encounters) in the folder src/plane_bringup/Detection_encounters/.
+
+ ### MIT Encounter Set Simulator with Variable number of cameras.
+This launch file is similar to MIT_Trajectory_follower.launch.py. It simulates the MIT trajectory encounter but lets you define how many cameras the ownship uses for intruder detection. To set the number of cameras, change the camera mode of the respective airplane to '3.0', and set the desired count in camera_numbers inside MIT_variable_cam_Trajectory_follower.launch.py. It also requires updating the DATA path to enable the data-collection workflow.
+ ``` python
+# Spawn the airplanes:
+    airplanes = [ownship_name,intruder_name]
+    camera = ['3.0', '0.0']
+    camera_numbers = ['3', '0']
+    launch_descriptions_airplanes = []
+    launch_description_delete_airplanes = []
+```
+To run the simualtion use the executable:
+``` bash
+ros2 launch plane_bringup MIT_variable_cam_Trajectory_follower.launch.py 
+```
 
 ## Simulation Characteristics:
 Every launch file has variables to modify the DAA scenario by modifying the visual detection, senors meassurements or the camera clutter. 
 
-### 1. World
+### 1. World File
 If you want to change the world used by one of the launch files, open the corresponding launch file, locate the world configuration parameters, and change the file name.
+
 ![Alt Text](DATA/Images/1.png)
 
-#### 2. Fog density
+The Simualiton environment containst 4 different world:
+* **MIT_city.world:** The largest world containing the Hanscom Airforce base sourrandings with an urban area of 10 mi by 10 mi.
+* **empty_world.world:**  An empty Gazebo world that contains allt he pluggins required to run the simulations.
+* **ERAU.world:** the Embry Riddle Aeronautical University Campus in Daytona Beach.
+* **NewYork.world:** A small section of the New Yowk Times Square.
+* **Mountains.world:** Small section of the Rocky mountains. 
+
+#### 2. Fog Density
 The fog density value used for the data recollection is  changed in the same section that the world file is changed. However, to adjust the fog density in the simulation, open the world file, navigate to the <scene> section, and modify the fog density value to match the input specified in the launch file parameters. For exmaple:
 
 ```xml
@@ -107,37 +146,7 @@ To change the zero mean standard deviation of the camera noise go to the gazebo.
     <xacro:property name="camera_noise_stddev" default="0.05"/> <!-- Change this value to add or decrease the zero mean stadard deviation noise of the camera -->
 ```
 
-## MIT Encounter Set Simulator.
-The ROS2 pacakge has a mit_path_follower executable, which les you simulate the intruder and ownship movements defined in the MIT DAA encoutner sets. To cahneg the encounter sets go to the src/plane_bringup/launch/MIT_Trajectory_follower.launch.py file and change the encounter set list. The program woudl simulate that encounter sets adn save the airplane and detection infromation in the DATA/MIT_Fligths folder. 
-```python
-# Launch follower varaibles:
-    ownship_name = "airplane_1"
-    intruder_name = "airplane_2"
-    encounter_list = "125,123,2689" # Add how many encounter sets you want in the string "encounter_1,encounter_2,..."
-    use_gpu = True # CHnage in case you want to use GPU in the YOLO detection model.
-```
-To run the executbale you only need to launch the file using the ros2 command:
-```bash
-ros2 launch plane_bringup MIT_Trajectory_follower.launch.py 
-```
 
-**IMPORTANT:** Before running the simulations, you must add the MIT encounter set data file [data.zip](https://www.ll.mit.edu/r-d/datasets/unmanned-aircraft-terminal-area-encounters) in src/plane_follow_exec/DATA/.
- to src/plane_follow_exec/DATA/. Additionally, if you want to use the MIT encounters list with the nearest CPA to use detection add the file [terminal_encounter_info_20200630.csv](https://www.ll.mit.edu/r-d/datasets/unmanned-aircraft-terminal-area-encounters) in the folder src/plane_bringup/Detection_encounters/.
-
- #### MIT Encounter Set Simulator with Variable number of cameras.
-This launch file is similar to MIT_Trajectory_follower.launch.py. It simulates the MIT trajectory encounter but lets you define how many cameras the ownship uses for intruder detection. To set the number of cameras, change the camera mode of the respective airplane to '3.0', and set the desired count in camera_numbers inside MIT_variable_cam_Trajectory_follower.launch.py.
- ``` python
-# Spawn the airplanes:
-    airplanes = [ownship_name,intruder_name]
-    camera = ['3.0', '0.0']
-    camera_numbers = ['3', '0']
-    launch_descriptions_airplanes = []
-    launch_description_delete_airplanes = []
-```
-To run the simualtion use the executable:
-``` bash
-ros2 launch plane_bringup MIT_variable_cam_Trajectory_follower.launch.py 
-```
 
 
 
