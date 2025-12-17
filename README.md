@@ -58,7 +58,7 @@ The installation process requires cloning the repository with its recursive sub-
 
 ```bash
 git clone --recurse-submodules https://github.com/Darkjrcy/FAA-Gazebo-Environment.git
-cd FAA_Recognition_Draft
+cd FAA-Gazebo-Environment
 bash setup.sh
 ```
 
