@@ -1,4 +1,4 @@
-# FAA_Recognition_Draft
+# FAA-Gazebo-Environment
 ***
 ## Dependencies
 The Gazebo Simulations of Detect and Avoid (DAA), focused on generating detection confidence levels under varying visual environmental factors (such as visual clutter, fog, and camera noise), require several Python libraries and ROS 2 dependencies:
