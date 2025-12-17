@@ -72,7 +72,7 @@ The process to generate new worlds for you Gazebo Simulation is presented in [Wo
 The Repository contains three main detection simulations, each one with their own launch file and characteristics.
 
 ## MIT Encounter Set Simulator.
-The ROS2 pacakge has a mit_path_follower executable, which les you simulate the intruder and ownship movements defined in the MIT DAA encoutner sets. To cahneg the encounter sets go to the src/plane_bringup/launch/MIT_Trajectory_follower.launch.py file and change the encounter set list. The program woudl simulate that encounter sets adn save the airplane and detection infromation in the DATA/MIT_Fligths folder. 
+The ROS2 pacakge has a mit_path_follower executable, which les you simulate the intruder and ownship movements defined in the MIT DAA encoutner sets. To change the encounter sets go to the src/plane_bringup/launch/MIT_Trajectory_follower.launch.py file and change the encounter set list. 
 ```python
 # Launch follower varaibles:
     ownship_name = "airplane_1"
@@ -80,16 +80,20 @@ The ROS2 pacakge has a mit_path_follower executable, which les you simulate the 
     encounter_list = "125,123,2689" # Add how many encounter sets you want in the string "encounter_1,encounter_2,..."
     use_gpu = True # CHnage in case you want to use GPU in the YOLO detection model.
 ```
+The program would simulate that encounter sets adn save the airplane and detection information in the DATA/MIT_Fligths folder that conatins two subfolders:
+* **detection_data:** This folder contains a summary of the visual clutter characteristics and the intruder detection history generated during the MIT encounter simulations.
+* **states_data:** This folder contains the state history of both the intruder and the ownship during the MIT encounter simulation.  
+
 To run the executbale you only need to launch the file using the ros2 command:
 ```bash
 ros2 launch plane_bringup MIT_Trajectory_follower.launch.py 
 ```
 
 **IMPORTANT:** Before running the simulations, you must add the MIT encounter set data file [data.zip](https://www.ll.mit.edu/r-d/datasets/unmanned-aircraft-terminal-area-encounters) in src/plane_follow_exec/DATA/.
- to src/plane_follow_exec/DATA/. Additionally, if you want to use the MIT encounters list with the nearest CPA to use detection add the file [terminal_encounter_info_20200630.csv](https://www.ll.mit.edu/r-d/datasets/unmanned-aircraft-terminal-area-encounters) in the folder src/plane_bringup/Detection_encounters/.
+ to src/plane_follow_exec/DATA/.  Additionally, if you want to use the MIT encounters list with the nearest CPA to use detection add the file [terminal_encounter_info_20200630.csv](https://www.ll.mit.edu/r-d/datasets/unmanned-aircraft-terminal-area-encounters) in the folder src/plane_bringup/Detection_encounters/. 
 
 ***
- ### MIT Encounter Set Simulator with Variable number of cameras.
+ ### MIT Encounter Set Simulator with Variable number of cameras
 This launch file is similar to MIT_Trajectory_follower.launch.py. It simulates the MIT trajectory encounter but lets you define how many cameras the ownship uses for intruder detection. To set the number of cameras, change the camera mode of the respective airplane to '3.0', and set the desired count in camera_numbers inside MIT_variable_cam_Trajectory_follower.launch.py. It also requires updating the DATA path to enable the data-collection workflow.
  ``` python
 # Spawn the airplanes:
@@ -104,6 +108,57 @@ To run the simualtion use the executable:
 ros2 launch plane_bringup MIT_variable_cam_Trajectory_follower.launch.py 
 ```
 
+ ### Detect and Avoid Simulations
+ The simulation is set up to run multiple DAA scenarios in the same run without restarting Gazebo, for that the user needs to define a list of different trajectories. The information of each traejctory is in feets and has the following format (North_1, East_1, Down_1, Velocity_1; North_2, East_2, Down_2, Velocity_2;...;North_n, East_n, Down_n, Velocity_n). To add multiple trajectories the user can divide using the percentage symbol %, for example:
+
+``` python
+uav_waypoints = (
+        "4000, 0, -280, 80; "
+        "5200, 0, -300, 85; "
+        "6400, 0, -310, 90; "
+        "7600, 0, -320, 90; "
+        "8800, 0, -325, 90; "
+        "9200, 0, -325, 90; "
+        "10000, 0, -325, 90; "
+        "12000, 0, -325, 90; "
+        "14000, 0, -325, 90; "
+        "16000, 0, -340, 90"
+        " % "
+        "4000, 0, -280, 80; "
+        "5200, 0, -300, 85; "
+        "6400, 0, -310, 90; "
+        "7600, 0, -320, 90; "
+        "8800, 0, -325, 90; "
+        "9200, 0, -325, 90; "
+        "10000, 0, -325, 90; "
+        "12000, 0, -325, 90; "
+        "14000, 0, -325, 90; "
+        "16000, 0, -340, 90"
+        " % "
+        "4000, 0, -280, 80; "
+        "5200, 0, -300, 85; "
+        "6400, 0, -310, 90; "
+        "7600, 0, -320, 90; "
+        "8800, 0, -325, 90; "
+        "9200, 0, -325, 90; "
+        "10000, 0, -325, 90; "
+        "12000, 0, -325, 90; "
+        "14000, 0, -325, 90; "
+        "16000, 0, -340, 90"
+        " % "
+        "4000, 0, -280, 80; "
+        "5200, 0, -280, 80; "
+        "6400, 0, -280, 80; "
+        "7600, 0, -280, 80; "
+        "8800, 0, -280, 80; "
+        "10000, 0, -280, 80"
+    )
+```
+
+
+
+
+***
 ## Simulation Characteristics:
 Every launch file has variables to modify the DAA scenario by modifying the visual detection, senors meassurements or the camera clutter. 
 
