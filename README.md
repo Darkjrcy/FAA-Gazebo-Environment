@@ -69,7 +69,7 @@ The process to generate new worlds for you Gazebo Simulation is presented in [Wo
 
 ***
 ## Run the Detection Simulations
-The Repository contains four main detection simulations models:
+The Repository contains three main detection simulations models:
 
 ### Casia X Camera Detection Simulation
 There is an additional detection simulation based on the closest approach point from the MIT Detect and Avoid (DAA) trajectories, which uses a realistic camera configuration of 5 cameras (Casia X). The resulting detection files follow the same structure as the previous simulation and are saved in FOLDER/MIT_Recognition. To run this simulation, use the next command.
