@@ -25,7 +25,7 @@ from rclpy.node import Node
 from std_msgs.msg import Bool
 from geometry_msgs.msg import Twist
 from std_srvs.srv import Trigger
-from airplane_gazebo_plugin.msg import AirplaneKineticModelInfo
+from airplane_gazebo_plugin.msg import AirplaneKineticModelInfo, AdsbData
 from custom_msgs.msg import Yolov11Inference360
 # Service to spawn the airplane in a position 
 from gazebo_msgs.srv import SetEntityState
@@ -62,6 +62,9 @@ class MITEncounterFollower(Node):
         self.declare_parameter('Back_left_camera_active',"True")
         self.declare_parameter('Frontal_left_camera_active',"True")
 
+        # Declare arguments to show the ADS-B working:
+        self.declare_parameter('plot_adsb_diff', 0)
+
         # Save the arguments in variables:
         self.waypoint_list = self.get_parameter('waypoint_list').value
         self.tcpa_list = self.get_parameter('tcpa_list').value
@@ -81,6 +84,11 @@ class MITEncounterFollower(Node):
         self.frontal_left_camera_active = self.get_parameter('Frontal_left_camera_active').value
         self.back_rigth_camera_active = self.get_parameter('Back_rigth_camera_active').value
         self.back_left_camera_active = self.get_parameter('Back_left_camera_active').value
+        self.adsb_bool = self.get_parameter('plot_adsb_diff').value
+        if self.adsb_bool > 0:
+            self.plot_adsb_diff = True
+        else:
+            self.plot_adsb_diff = False
 
         # Gnerate the set of Waypoints for both airplanes;
         # Divide the encunter set numbers in a list
@@ -193,6 +201,37 @@ class MITEncounterFollower(Node):
         # Create subscribers to see whenver one aiplne is near the goal:
         self.own_traj_complete_sub =self.create_subscription(Bool,f"/{self.own_airplane}/traj_complete",self.own_complete_callback,q_events)
         self.in_traj_complete_sub =self.create_subscription(Bool,f"/{self.in_airplane}/traj_complete",self.in_complete_callback,q_events)
+
+        # Create subscribers tot eh adsb_out of the intruder inc ase it want to be plot:
+        self.adbs_int_info = self.create_subscription(AdsbData,f"/{self.in_airplane}/adsb_out",self.adsb_callback,q_reliable)
+        # Save the states of the adsb
+        self.adsb_x_ft = []
+        self.adsb_y_ft = []
+        self.adsb_z_ft = []
+        self.adsb_vx_fts = []
+        self.adsb_vy_fts = []
+        self.adsb_vz_fts = []
+        # Create variables to save the individual information:
+        self.in_adsb_x = 0
+        self.in_adsb_y = 0
+        self.in_adsb_z = 0
+        self.in_adsb_vx = 0
+        self.in_adsb_vy = 0
+        self.in_adsb_vz = 0
+        # Check if adsb at least has one value:
+        self.has_adsb = False
+        
+        if self.plot_adsb_diff:
+            # Create lists to save the adsb_information:
+            self.time_adsb = []
+            # List to get the erros of the states:
+            self.adsb_err_x_ft = []
+            self.adsb_err_y_ft = []
+            self.adsb_err_z_ft = []
+            self.adsb_err_vx_fts = []
+            self.adsb_err_vy_fts = []
+            self.adsb_err_vz_fts = []
+
 
         # Generate lists to save previous states of the airplane to plot them:
         # Ownship
@@ -312,6 +351,31 @@ class MITEncounterFollower(Node):
         self.preprocess_times = []
         self.inference_times = []
         self.postprocess_times = []
+
+        # In case the adsb need to be plot re-initialize the variables:
+        self.in_adsb_x = 0
+        self.in_adsb_y = 0
+        self.in_adsb_z = 0
+        self.in_adsb_vx = 0
+        self.in_adsb_vy = 0
+        self.in_adsb_vz = 0
+        self.in_adsb_course = 0
+        self.has_adsb = False
+        self.time_adsb = []
+        self.adsb_x_ft = []
+        self.adsb_y_ft = []
+        self.adsb_z_ft = []
+        self.adsb_vx_fts = []
+        self.adsb_vy_fts = []
+        self.adsb_vz_fts = []
+        if self.plot_adsb_diff:
+            self.adsb_err_x_ft = []
+            self.adsb_err_y_ft = []
+            self.adsb_err_z_ft = []
+            self.adsb_err_vx_fts = []
+            self.adsb_err_vy_fts = []
+            self.adsb_err_vz_fts = []
+
 
     
     # Define a call service to start the detection or stop it:
@@ -447,6 +511,28 @@ class MITEncounterFollower(Node):
             self.get_logger().info(f'{service_name} service call failed')
             return False
         
+    
+    # Setup the plot incase adsb need to be comapred:
+    def setup_diff_plot(self, waypoint_idx):
+        if not self.plot_adsb_diff:
+            return
+        plt.ion()
+        self.fig_diff, self.ax_diff = plt.subplots(3, 2, figsize=(10, 8), constrained_layout=True)
+        self.fig_diff.canvas.manager.set_window_title(f"ADS-B vs State Δ | Encounter {waypoint_idx}")
+
+        # Axes order: x,y,z,vx,vy,vz
+        titles = [r'Δx (ft)', r'Δ$v_x$ (ft/s)', r'Δy (ft)', r'Δ$v_y$ (ft/s)', r'Δz (ft)', r'Δ$v_z$ (ft/s)']
+        self.diff_lines = []
+        for ax, title in zip(self.ax_diff.flatten(), titles):
+            ax.set_title(title)
+            ax.set_xlabel('Sim time (s)')
+            ax.grid(True)
+            (line,) = ax.plot([], [])
+            self.diff_lines.append(line)
+
+        # handy refs:
+        (self.ax_dx, self.ax_dvx, self.ax_dy, self.ax_dvy, self.ax_dz, self.ax_dvz) = self.ax_diff.flatten()
+        
 
     # Ploting system to restart the ploting and plot the new trajectories every timie it completes one wncounter set:
     def setup_plot(self,in_traj,own_traj,waypoint_idx):
@@ -489,6 +575,12 @@ class MITEncounterFollower(Node):
         self.ax.set_ylim(mid_y - max_range, mid_y + max_range)
         self.ax.set_zlim(mid_z - max_range, mid_z + max_range)
         plt.show()
+
+        # Setup the plots of the differnce between the adsb states and real states:
+        self.setup_diff_plot(waypoint_idx)
+
+            
+
     
 
     # Save the scores saved depending on the camera that detects it
@@ -517,6 +609,21 @@ class MITEncounterFollower(Node):
                     self.left_back_camera_score = yolov11_inf.score
                 elif yolov11_inf.camera_name == "left_front_camera" and yolov11_inf.score > self.left_front_camera_score:
                     self.left_front_camera_score = yolov11_inf.score
+
+    
+    # Save the adsb_info to be plot:
+    def adsb_callback(self, msg):
+        # Get the last values:
+        self.in_adsb_x = msg.east/0.3048
+        self.in_adsb_y = msg.north/0.3048
+        self.in_adsb_z = msg.up/0.3048
+        self.in_adsb_vx = msg.v_east/0.3048
+        self.in_adsb_vy = msg.v_north/0.3048
+        self.in_adsb_vz = msg.v_up/0.3048
+        self.in_adsb_course = msg.course
+
+        # Chaeck that adsb at least has one value:
+        self.has_adsb = True
 
 
     # Timer callback:
@@ -560,6 +667,46 @@ class MITEncounterFollower(Node):
         self.left_front_camera_scores.append(self.left_front_camera_score)
         self.rigth_back_camera_scores.append(self.rigth_back_camera_score)
         self.left_back_camera_scores.append(self.left_back_camera_score)
+        
+        # Save the ADSB-DATA only when it wants to be plottes:
+        self.time_adsb.append(self.sim_time - self.init_sim_time)
+        # Save the data of the adsb in the lsits:
+        self.adsb_x_ft.append(self.in_adsb_x)   
+        self.adsb_y_ft.append(self.in_adsb_y)        
+        self.adsb_z_ft.append(self.in_adsb_z)        
+        self.adsb_vx_fts.append(self.in_adsb_vx)        
+        self.adsb_vy_fts.append(self.in_adsb_vy)        
+        self.adsb_vz_fts.append(self.in_adsb_vz) 
+
+        if self.plot_adsb_diff and self.has_adsb:                
+            # Use latest samples (everything is in feet / ft/s)
+            dx  = self.in_x_ft[-1]   - self.in_adsb_x
+            dy  = self.in_y_ft[-1]   - self.in_adsb_y
+            dz  = self.in_alt_ft[-1] - self.in_adsb_z
+            dvx = self.in_vx_fts[-1] - self.in_adsb_vx
+            dvy = self.in_vy_fts[-1] - self.in_adsb_vy
+            dvz = self.in_vz_fts[-1] - self.in_adsb_vz
+
+            # Save the errors in a list
+            self.adsb_err_x_ft.append(dx)
+            self.adsb_err_y_ft.append(dy)
+            self.adsb_err_z_ft.append(dz)
+            self.adsb_err_vx_fts.append(dvx)
+            self.adsb_err_vy_fts.append(dvy)
+            self.adsb_err_vz_fts.append(dvz)
+
+            # update live lines vs sim time
+            series = [self.adsb_err_x_ft, self.adsb_err_vx_fts, self.adsb_err_y_ft, self.adsb_err_vy_fts, self.adsb_err_z_ft,  self.adsb_err_vz_fts]
+            for line, data in zip(self.diff_lines, series):
+                line.set_data(self.time_adsb, data)
+
+            # rescale axes
+            for ax2 in self.ax_diff.flatten():
+                ax2.relim()
+                ax2.autoscale_view()
+
+            plt.pause(0.001)
+
 
     
     # Save the inframtion in the diferent folders:
@@ -584,6 +731,13 @@ class MITEncounterFollower(Node):
             file.write("Real_time_s,Simulation_time_s,Real_time_factor,x_ft,y_ft,alt_ft,vx_fps,vy_fps,vz_fps,roll_rad,pitch_rad,yaw_rad\n")
             for i in range(len(self.rtf)):
                 file.write(f"{self.real_time_s[i]},{self.sim_time_s[i]},{self.rtf[i]},{self.in_x_ft[i]},{self.in_y_ft[i]},{self.in_alt_ft[i]},{self.in_vx_fts[i]},{self.in_vy_fts[i]},{self.in_vz_fts[i]},{self.in_roll_rad[i]},{self.in_pitch_rad[i]},{self.in_yaw_rad[i]}\n")
+        # ADS-B Intruder Data:
+        adsb_data_file = os.path.join(folder_airplane_states, "adsb_intruder_states.csv")
+        with open(adsb_data_file, 'w') as file:
+            file.write("Simulation_time_s,x_ft,y_ft,alt_ft,vx_fps,vy_fps,vz_fps\n")
+            for i in range(len(self.time_adsb)):
+                file.write(f"{self.time_adsb[i]},{self.adsb_x_ft[i]},{self.adsb_y_ft[i]},{self.adsb_z_ft[i]},{self.adsb_vx_fts[i]},{self.adsb_vy_fts[i]},{self.adsb_vz_fts[i]}\n")
+
         
         # Generate the csv file with the YOLO detection summary;
         folder_detection = os.path.join(fligth_folder, "detection_data")
@@ -653,12 +807,19 @@ class MITEncounterFollower(Node):
             try:
                 start_own = self.create_client(Trigger, f"/{self.own_airplane}/trigger_service")
                 start_in = self.create_client(Trigger, f"/{self.in_airplane}/trigger_service")
+                # Create a client to start the adsb_det:
+                start_in_adsb = self.create_client(Trigger, f"/{self.in_airplane}/adsb_start_service")
+                stop_in_adsb = self.create_client(Trigger, f"/{self.in_airplane}/adsb_stop_service")
+
                 for cli, name in [(start_own, "own"), (start_in, "intruder")]:
                     while not cli.wait_for_service(timeout_sec=1.0):
                         self.get_logger().warn(f"Waiting for {name} trigger service...")
+
                 fut_own = start_own.call_async(Trigger.Request())
                 fut_in = start_in.call_async(Trigger.Request())
+                fut_start_in_adsb = start_in_adsb.call_async(Trigger.Request())
                 # Spin both executables:
+                rclpy.spin_until_future_complete(self, fut_start_in_adsb)
                 rclpy.spin_until_future_complete(self, fut_own)
                 rclpy.spin_until_future_complete(self, fut_in)
                 # Wait until both finish;
@@ -682,6 +843,8 @@ class MITEncounterFollower(Node):
                     process_own.kill()
                     process_in.kill()
             finally:
+                fut_stop_in_adsb = stop_in_adsb.call_async(Trigger.Request())
+                rclpy.spin_until_future_complete(self, fut_stop_in_adsb)
                 self.save_information(self.waypoint_indices[i])
                 plt.pause(5)
                 

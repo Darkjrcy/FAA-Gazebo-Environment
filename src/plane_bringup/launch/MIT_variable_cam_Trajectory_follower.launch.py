@@ -30,7 +30,7 @@ def generate_launch_description():
     package_share_directory_launch = Path(get_package_share_directory('plane_bringup'))
     json_ecounter_list_path = package_share_directory_launch / "Detection_encounters" / "encounters_tcpa.json"
     # Define the number of encounter you can to simulate:
-    strating_point = 920
+    strating_point = 800
     number_encounters = 1000
     # Open the json file and add the encoutners id in a list:
     with json_ecounter_list_path.open("r", encoding="utf-8") as fil:
@@ -73,6 +73,7 @@ def generate_launch_description():
             test_numbers.append(int(match.group(1)))
     # Determine the next test folder number
     if test_numbers:
+
         next_folder_number = max(test_numbers) + 1
     else:
         next_folder_number = 1
@@ -95,7 +96,7 @@ def generate_launch_description():
             ])
         ]),
         launch_arguments={
-            'world': [os.path.join(get_package_share_directory('plane_bringup'), 'worlds', 'empty_world.world'), ''],
+            'world': [os.path.join(get_package_share_directory('plane_bringup'), 'worlds', 'MIT_city.world'), ''],
             'camera' : 'true'
         }.items()
     )
@@ -180,11 +181,11 @@ def generate_launch_description():
             'tcpa_list': tcpa_list,
             "frecuency": 10,
             "fog_type": "exponential",        # Verify the type in the world file in the scene branch
-            "fog_density": 0.01,             # The sanme goes for the fog density
+            "fog_density": 0.001,             # The sanme goes for the fog density
             "camera_noise_type": "Gaussian",  # Check the noise type of the cameras in the Airplane gazebo section urdf
             "camera_noise_std": 0.00,         # Do the same for the standard deviatio
             "camera_resolution": "3776x2360", # Check the resultion in the urdf too
-            "clutter": "Empty_world", # Check the world file you are inputing
+            "clutter": "Hanscom_Air_Force_Base_Sourrandings", # Check the world file you are inputing
             "Yolo_model": "Yolo_m", # Define the yolo model used.
             "Frontal_camera_active": ParameterValue(
             LaunchConfiguration(f'{ownship_name}_cam1'), value_type=str),

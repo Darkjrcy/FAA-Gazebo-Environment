@@ -23,6 +23,7 @@ find_package(gazebo_ros REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(tf2 REQUIRED)
@@ -31,6 +32,7 @@ find_package(tf2_ros REQUIRED)
 find_package(gazebo REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(ignition-math6 REQUIRED)
+find_package(gnss_multipath_plugin REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 link_directories(${gazebo_dev_LIBRARY_DIRS})
@@ -39,6 +41,7 @@ link_directories(${gazebo_dev_LIBRARY_DIRS})
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/AirplaneKineticModelInfo.msg"
   "msg/AvoidanceStates.msg"
+  "msg/AdsbData.msg"
   DEPENDENCIES std_msgs builtin_interfaces
 )
 ament_export_dependencies(rosidl_default_runtime)
@@ -117,6 +120,33 @@ target_include_directories(geometric_wp_detect_and_avoidance PUBLIC
   ${EIGEN3_INCLUDE_DIRS}
 )
 install(TARGETS geometric_wp_detect_and_avoidance
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# Build the ADSB sensor
+add_executable(adsb_sensor
+  src/adsb_sensor.cpp
+)
+ament_target_dependencies(adsb_sensor
+  "rclcpp"
+  "geometry_msgs"
+  "std_msgs"
+  "std_srvs"
+  "sensor_msgs"
+  "Eigen3"
+  "gnss_multipath_plugin"
+  "rosidl_default_runtime"
+)
+add_dependencies(adsb_sensor
+  ${PROJECT_NAME}__cpp
+)
+rosidl_get_typesupport_target(cpp_typesupport_target "${PROJECT_NAME}" "rosidl_typesupport_cpp")
+target_link_libraries(adsb_sensor "${cpp_typesupport_target}")
+target_include_directories(adsb_sensor PUBLIC
+  ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_cpp
+  ${EIGEN3_INCLUDE_DIRS}
+)
+install(TARGETS adsb_sensor
   DESTINATION lib/${PROJECT_NAME}
 )
 

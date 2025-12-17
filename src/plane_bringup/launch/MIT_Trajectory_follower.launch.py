@@ -91,7 +91,7 @@ def generate_launch_description():
             ])
         ]),
         launch_arguments={
-            'world': [os.path.join(get_package_share_directory('plane_bringup'), 'worlds', 'empty_world.world'), ''],
+            'world': [os.path.join(get_package_share_directory('plane_bringup'), 'worlds', 'MIT_city.world'), ''],
             'camera' : 'true'
         }.items()
     )
@@ -180,9 +180,21 @@ def generate_launch_description():
             "camera_noise_std": 0.00,         # Do the same for the standard deviatio
             "camera_resolution": "3776x2360", # Check the resultion in the urdf too
             "clutter": "Empty_world", # Check the world file you are inputing
-            "Yolo_model": "Yolo_m", # Define the yolo model used.
+            "Yolo_model": "Yolo_m", # Define the yolo model used
+            "plot_adsb_diff": 0, # 1 means to plot
         }]
     )
+
+    # Luanch the adsb for the recivever:
+    adsb_intruder = Node(
+        package='airplane_gazebo_plugin',      
+        executable='adsb_sensor',             
+        name='adsb_sensor_launcher',
+        output='screen',
+        emulate_tty=True,
+        arguments=["airplane_2", "imu_2", '--ros-args'],
+    )
+
 
     # Register event handler so start_robot_move launches only after wait_for_gazebo_node exits
     launch_start_robot_move = RegisterEventHandler(
@@ -207,6 +219,7 @@ def generate_launch_description():
         start_world,
         *launch_descriptions_airplanes,
         camera_fusion,
+        adsb_intruder,
         #save_video,
         wait_for_gazebo_node,
         launch_start_robot_move,

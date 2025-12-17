@@ -95,8 +95,8 @@ private:
     Eigen::Vector3d last_waypoint_;
 
     // Define the vraibles of the Waypoint follower to see the next position:
-    double transition_radius = 200;
-    double look_ahead_distance = 300;
+    double transition_radius = 420;
+    double look_ahead_distance = 250;
 
     // Generate a boolean to start the following process with the service:
     bool start_following = false;
@@ -114,6 +114,13 @@ private:
     bool have_the_first_valid_msg = false;
     double last_velocity_ = 0.0;
 
+    // Boolean to tell the system start the avoidance:
+    bool start_the_avoidance = false; 
+    // Define the avoidance last point: 
+    Eigen::Vector3d avoidance_last_point_enu;
+    // ENd of avoidance arc made for avoidance:
+    size_t end_of_arc_ = 0; 
+
 
 
     // GEOMETRIC DETECT AND AVOID VARIABLES:
@@ -121,7 +128,7 @@ private:
     int conflicts = 0;
 
     // Critical time to start the avoidance:
-    double crit_time_ = 1.25;
+    double crit_time_ = 0.1;
     // Minimum transition radius for the avoidance aircraft
     double min_radius = 175;
 
@@ -188,6 +195,24 @@ private:
         // Check if it gets near the goal:
         Eigen::Vector3d act_mod_pose = actual_pose;
         act_mod_pose(2) = -act_mod_pose(2); 
+
+        // Identify when the systems gets to the avoidance waypoint:
+        if (start_the_avoidance) {
+            const Eigen::Vector3d avoidance_last_point_ned = ENU_to_NED(avoidance_last_point_enu); // (N,E,-U)
+
+            if (((act_mod_pose - avoidance_last_point_ned).norm() <= 100.0) || current_idx >= end_of_arc_) {
+                start_the_avoidance = false;
+
+                // restore thresholds/params
+                crit_time_ = 0.8;
+                min_radius = 150;         
+                transition_radius = 420;   
+                look_ahead_distance = 250;
+
+                RCLCPP_INFO(this->get_logger(), "Avoidance complete; resuming nominal path.");
+            }
+        }
+
         // Do a threshold to stop the follower:
         if ((act_mod_pose - last_waypoint_).norm() <= 50){
             goal_reached_ = true;
@@ -245,6 +270,11 @@ private:
         const double own_ve = avoider_current_state_.v_east;
         const double own_vn = avoider_current_state_.v_north;
         const double own_vu = avoider_current_state_.v_up;
+        // Save its actual position and velocit of the ownship:
+        Eigen::Vector3d actual_pose;
+        actual_pose << own_e, own_n, own_u;
+        Eigen::Vector3d actual_vel;
+        actual_vel << own_ve, own_vn, own_vu;
         // Course and fligth path angles:
         const double own_course = avoider_current_state_.course;
         const double own_fpa = avoider_current_state_.fpa;
@@ -258,17 +288,27 @@ private:
         }
 
         // Obtain the future obstacles position:
-        std::vector<Eigen::Vector3d> Target_Next_pos = Estimate_target_next_position(active_conflicts);
+        std::vector<Eigen::Vector3d> Target_Next_pos = Estimate_target_next_position(active_conflicts,actual_pose,actual_vel);
 
         // Use a variable the save the overall active obstacles:
         FCABundle overall_obstacles;
 
         // Overlap obstacle that near each other or inside the minimum radius threshold
         if (active_conflicts.conflicts > 1){
-            overall_obstacles = Check_for_overalping(active_conflicts, own_e, own_n, own_u, own_ve, own_vn, own_vu, Target_Next_pos);
+            overall_obstacles = Check_for_overalping(active_conflicts, own_e, own_n, own_u, own_ve, own_vn, own_vu);
+            Target_Next_pos = Estimate_target_next_position(overall_obstacles,actual_pose,actual_vel);
         } else {
             overall_obstacles = active_conflicts;
         }
+
+        // for (size_t k = 0; k < Target_Next_pos.size(); ++k) {
+        //     const auto &p = Target_Next_pos[k];
+        //     RCLCPP_INFO(
+        //         this->get_logger(),
+        //         "Target %zu next position: East=%f, North=%f, Up=%f",
+        //         k, p.x(), p.y(), p.z()
+        //     );
+        // }
 
         // Calculate their critical avoidance time to generate the avoiance waypoints:
         avoidance_waypoints(overall_obstacles, own_e, own_n, own_u, own_ve, own_vn, own_vu, own_course, own_fpa, Target_Next_pos);
@@ -354,9 +394,11 @@ private:
 
         // Loop in each of the intruders:
         for (size_t i = 0; i<n; i++){
+            // Own velocity norm:
+            const double own_vel_a = std::sqrt(own_vn*own_vn+own_ve*own_ve+own_vu*own_vu);
             // Open the data of each intruder:
             const auto &intr = intruders.intruder_states[i];
-            const double dm = 1.5*(intr.velocity_a*crit_time_+150);
+            const double dm = 1.5*(intr.velocity_a*1.0+125+1.5*6+1.0*own_vel_a);
             const std::string &id = intruders.obstacles_id[i];
 
             // relative position and velocity:
@@ -401,7 +443,7 @@ private:
 
 
     // Estimate the targets next position:
-    std::vector<Eigen::Vector3d> Estimate_target_next_position(const FCABundle &intruders)
+    std::vector<Eigen::Vector3d> Estimate_target_next_position(const FCABundle &intruders, const Eigen::Vector3d &act_position, const Eigen::Vector3d &act_vel)
     {
         // Varible where the future target's positions are saved:
         std::vector<Eigen::Vector3d> future_target_pos;
@@ -409,15 +451,50 @@ private:
 
         for (const auto &o : intruders.act_intruders) {
             // Use the critical minimum time to see the estiamte the future position fo the obstacle
-            future_target_pos.emplace_back(o.rel_pos_enu + crit_time_ * o.rel_vel_enu);
+            future_target_pos.emplace_back(o.rel_pos_enu - crit_time_ * (o.rel_vel_enu-act_vel) + act_position);
         }
         return future_target_pos;
 
     }
 
 
+    // Funciton to print the ownship psition and the intruders for debbugins
+    void print_intruders_and_ownship(const Eigen::Vector3d &own_pos, const Eigen::Vector3d &own_vel, const FCABundle &obstacles)
+    {
+        // Print ownship state
+        RCLCPP_INFO(
+            this->get_logger(),
+            "OWN Position (ENU):   E=%f  N=%f  U=%f",
+            own_pos.x(), own_pos.y(), own_pos.z()
+        );
+
+        RCLCPP_INFO(
+            this->get_logger(),
+            "OWN Velocity (ENU):   VE=%f  VN=%f  VU=%f",
+            own_vel.x(), own_vel.y(), own_vel.z()
+        );
+
+        // Print each intruder
+        for (size_t i = 0; i < obstacles.act_intruders.size(); ++i) {
+            const auto &intr = obstacles.act_intruders[i];
+
+            RCLCPP_INFO(
+                this->get_logger(),
+                "INTRUDER %zu Position (ENU):   E=%f  N=%f  U=%f",
+                i, intr.rel_pos_enu.x()+own_pos.x(), intr.rel_pos_enu.y()+own_pos.y(), intr.rel_pos_enu.z()+own_pos.z()
+            );
+
+            RCLCPP_INFO(
+                this->get_logger(),
+                "INTRUDER %zu Velocity (ENU):   VE=%f  VN=%f  VU=%f",
+                i, -intr.rel_vel_enu.x()+own_vel.x(), -intr.rel_vel_enu.y()+own_vel.y(), -intr.rel_vel_enu.z()+own_vel.z()
+            );
+        }
+    }
+
+
     //  Check for overlaping between the different active osbtacles to fusion them:
-    FCABundle Check_for_overalping(const FCABundle &active_obstacles, double own_e, double own_n, double own_u,double own_ve, double own_vn, double own_vu, std::vector<Eigen::Vector3d> &future_target_pos)
+    FCABundle Check_for_overalping(const FCABundle &active_obstacles, double own_e, double own_n, double own_u,double own_ve, double own_vn, double own_vu)
     {
         // Start the structure to save the overalping obstacles;
         FCABundle overlaped_obs;
@@ -438,9 +515,6 @@ private:
             Eigen::Vector3d act_rel_pos = obstacles[i].rel_pos_enu;
             Eigen::Vector3d act_rel_vel = obstacles[i].rel_vel_enu;
             double act_dme = obstacles[i].dm;
-            // Quantity to save the minimum distance in the avoidance
-            double min_avoidance_dist = 0;
-            int count_over = 0;
 
             // Loop inside each of the other obstacles:
             for (size_t j=0; j < n; ++j){
@@ -465,13 +539,11 @@ private:
                 if (overlap){
                     act_dme = (act_dme + rel_pos_ij.norm() + obstacles[j].dm) * 0.5;
                     act_rel_pos = obstacles[j].rel_pos_enu + (rel_pos_ij.normalized()) * (act_dme - obstacles[j].dm);
-                    
-                    // Define the new overlap realtive velocity with the smallest distane between the airplane and future target position:
-                    double future_distance = (act_pos - future_target_pos[j]).norm();
-                    if (count_over == 0 || future_distance < min_avoidance_dist){
-                        count_over = 1;
-                        min_avoidance_dist = future_distance;
-                        act_rel_vel = obstacles[j].rel_vel_enu;
+
+                    // Add the effect of the aded intruder to the obstacle in the velocity:
+                    double rel_ij_norm = rel_pos_ij.norm();
+                    if (rel_ij_norm > 1e-6) {  // or whatever epsilon you like
+                        act_rel_vel += 0.2 * obstacles[j].rel_vel_enu;
                     }
                 }
             }
@@ -539,16 +611,31 @@ private:
         for (size_t i = 0; i < n ; ++i){
             // Caclulate the critical time of each target:
             double act_crit_time = (act_obstacles[i].rel_pos_enu.norm()*(std::cos(act_obstacles[i].theta_to)+std::sin(act_obstacles[i].theta_to))-min_radius-act_obstacles[i].dm)/(act_obstacles[i].rel_vel_enu.norm());
+            // check if one of the airplanes that was already avoided is giving problems by staying in a negative avoidance zone:
+            if (act_crit_time < -1.5){continue;}
             if (count_time == 0 || act_crit_time < min_crit_time){
                 count_time = 1;
-                min_crit_time = act_crit_time;
+                min_crit_time = act_crit_time; 
                 crit_target_idx = i;
             }
         }
 
+        // RCLCPP_INFO(this->get_logger(), "critical time = %f", min_crit_time);
+        
+
         // Add the avoidance waypoints in case the critical time is small:
         // return in case the minimum critical time is not enough
-        if (crit_time_ < min_crit_time) {return;}
+        if (start_the_avoidance) {
+            RCLCPP_INFO(this->get_logger(), "The avoidance process started!!!");
+            return;
+        }                   
+        if (!std::isfinite(min_crit_time)||count_time==0) return;
+        if (min_crit_time > crit_time_) return;
+
+        // Start the avoidance in case it is lower than the critical time:
+        start_the_avoidance = true;
+        transition_radius = 200;
+        look_ahead_distance = 150;
 
         // Modify the waypoints:
         // Identify the actual avoidance obstacle characteristics:
@@ -584,8 +671,14 @@ private:
             circle.push_back(rotated_point);
         }
 
+        // Optional print to see hte avdoaince zone and radius:
+        RCLCPP_INFO(this->get_logger(), "dm_avoid = %.3f", dm_avoid);
+        RCLCPP_INFO(this->get_logger(), "avoidance_center = [%.3f, %.3f, %.3f]",
+                    avoidance_center.x(), avoidance_center.y(), avoidance_center.z());
+
+
         // Identify which Waypoint is going to be at the end of the avoidance
-        Eigen::Vector3d avoidance_last_point_enu = avoidance_center + act_vel.normalized() * dm_avoid;
+        avoidance_last_point_enu = avoidance_center + act_vel.normalized() * dm_avoid;
         // pass the avoidance to point from ENU to NED:
         Eigen::Vector3d avoidance_last_point_ned=  ENU_to_NED(avoidance_last_point_enu);
         // Find the nearest waypoint:
@@ -617,15 +710,20 @@ private:
             double horiz = std::max(std::sqrt(d_north*d_north + d_east*d_east), 1e-6);
             double d_pitch = std::atan2(d_alt, horiz);
             double d_yaw   = std::atan2(d_east, std::max(d_north, 1e-9)); // yaw-from-East
-            double value_1 = std::max((crit_next_pos - circle[i]).norm() / std::max(dm_avoid, 1e-6), 1e-6);
+
+            // Get a ratio that depends on the next posiiton orientation respct to teh pincipal avoidance circle position:
+            Eigen::Vector3d r_avo_fut = crit_next_pos - avoidance_center;
+            Eigen::Vector3d r_avo_circ = circle[i]  - avoidance_center;
+            double value_1 = std::abs(std::acos(r_avo_fut.dot(r_avo_circ)/(r_avo_fut.norm()*r_avo_circ.norm())));
+            
 
             double cost;
             if ((d_pitch - own_pitch) < 0.0) {
-                cost = ((1.0/value_1) + 2.4) * std::abs(d_pitch - own_pitch)
-                    + (1.0/value_1) * std::abs(d_yaw - own_yaw);
+                cost = ((1.0/(value_1+0.1)) + 2.4) * std::abs(d_pitch)
+                    + (1.0/(value_1+0.1)) * std::abs(d_yaw);
             } else {
-                cost = ((1.0/value_1) + 1.2) * std::abs(d_pitch - own_pitch)
-                    + (1.0/value_1) * std::abs(d_yaw - own_yaw);
+                cost = ((1.0/(value_1+0.1)) + 1.2) * std::abs(d_pitch)
+                    + (1.0/(value_1+0.1)) * std::abs(d_yaw);
             }
 
             if (min_cost < 0.0 || cost < min_cost) {
@@ -675,20 +773,20 @@ private:
         const double keep_speed = (insert_at_wp < cmd_vel_.size()) ? cmd_vel_[insert_at_wp] : last_velocity_;
         cmd_vel_.insert(cmd_vel_.begin() + static_cast<long>(insert_at_wp), 7, keep_speed);
         const size_t arc_len = avoidance_waypoints.size(); // 7
-        const size_t end_of_arc = insert_at_wp + arc_len - 1;
+        end_of_arc_ = insert_at_wp + arc_len - 1;
         // eliminate the middle waypoints in the avoidance path;
         size_t rejoin_idx_new = near_wp_idx;
         if (near_wp_idx >= insert_at_wp) {
             rejoin_idx_new += arc_len;
         }
-        if (rejoin_idx_new > end_of_arc + 1 && rejoin_idx_new <= waypoints_.size()) {
-            auto wp_erase_begin = waypoints_.begin() + static_cast<long>(end_of_arc + 1);
+        if (rejoin_idx_new > end_of_arc_ + 1 && rejoin_idx_new <= waypoints_.size()) {
+            auto wp_erase_begin = waypoints_.begin() + static_cast<long>(end_of_arc_ + 1);
             auto wp_erase_end   = waypoints_.begin() + static_cast<long>(rejoin_idx_new);
             waypoints_.erase(wp_erase_begin, wp_erase_end);
 
             // keep cmd_vel_ in sync
             if (cmd_vel_.size() >= rejoin_idx_new) {
-                auto sp_erase_begin = cmd_vel_.begin() + static_cast<long>(end_of_arc + 1);
+                auto sp_erase_begin = cmd_vel_.begin() + static_cast<long>(end_of_arc_ + 1);
                 auto sp_erase_end   = cmd_vel_.begin() + static_cast<long>(rejoin_idx_new);
                 cmd_vel_.erase(sp_erase_begin, sp_erase_end);
             }
@@ -895,3 +993,70 @@ int main(int argc, char **argv)
     rclcpp::shutdown();
     return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
