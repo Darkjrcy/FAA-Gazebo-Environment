@@ -57,7 +57,7 @@ The installation process requires cloning the repository with its recursive sub-
 ### Steps:
 
 ```bash
-git clone --recurse-submodules https://github.com/heverlasso/CRADA-architecture.git
+git clone --recurse-submodules https://github.com/Darkjrcy/FAA-Gazebo-Environment.git
 cd FAA_Recognition_Draft
 bash setup.sh
 ```
