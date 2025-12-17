@@ -69,23 +69,15 @@ The process to generate new worlds for you Gazebo Simulation is presented in [Wo
 
 ***
 ## Run the Detection Simulations
-The Repository contains three main detection simulations models:
+The Repository contains three main detection simulations, each one with their own launch file and characteristics.
 
-### Casia X Camera Detection Simulation
-There is an additional detection simulation based on the closest approach point from the MIT Detect and Avoid (DAA) trajectories, which uses a realistic camera configuration of 5 cameras (Casia X). The resulting detection files follow the same structure as the previous simulation and are saved in FOLDER/MIT_Recognition. To run this simulation, use the next command.
 
-```bash
-ros2 launch plane_bringup MIT_two_airplanes_with_recog.launch.py
-```
+## Simulation Characteristics:
+Every launch file has variables to modify the DAA scenario by modifying the visual detection, senors meassurements or the camera clutter. 
 
-### Modification inside the Simulations
-There are 4 easier changes that can be done to the simulation.
-
-#### 1. World
+### 1. World
 If you want to change the world used by one of the launch files, open the corresponding launch file, locate the world configuration parameters, and change the file name.
-
 ![Alt Text](DATA/Images/1.png)
-
 
 #### 2. Fog density
 The fog density value used for the data recollection is  changed in the same section that the world file is changed. However, to adjust the fog density in the simulation, open the world file, navigate to the <scene> section, and modify the fog density value to match the input specified in the launch file parameters. For exmaple:
